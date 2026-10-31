@@ -1,0 +1,74 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // User root document and structured subcollections
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+
+      // Profile settings: users/{userId}/profile/settings
+      match /profile/{settingDoc} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      // Conversations: users/{userId}/conversations/{conversationId}
+      match /conversations/{conversationId} {
+        allow read, delete: if request.auth != null && request.auth.uid == userId;
+        allow create, update: if request.auth != null 
+                             && request.auth.uid == userId 
+                             && (!('userId' in request.resource.data) || request.resource.data.userId == request.auth.uid);
+
+        // Nested Messages: users/{userId}/conversations/{conversationId}/messages/{messageId}
+        match /messages/{messageId} {
+          allow read, delete: if request.auth != null && request.auth.uid == userId;
+          allow create, update: if request.auth != null 
+                               && request.auth.uid == userId
+                               && (!('userId' in request.resource.data) || request.resource.data.userId == request.auth.uid);
+        }
+      }
+
+      // Study Notes: users/{userId}/notes/{noteId}
+      match /notes/{noteId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      // Quizzes: users/{userId}/quizzes/{quizId}
+      match /quizzes/{quizId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      // Study Plans: users/{userId}/studyPlans/{planId}
+      match /studyPlans/{planId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      // Flashcards: users/{userId}/flashcards/{deckId}
+      match /flashcards/{deckId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      // Subjects: users/{userId}/subjects/{subjectId}
+      match /subjects/{subjectId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      // Documents: users/{userId}/documents/{docId}
+      match /documents/{docId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+        match /chunks/{chunkId} {
+          allow read, write: if request.auth != null && request.auth.uid == userId;
+        }
+      }
+
+      // Fallback for any other custom subcollections under the user
+      match /{allSubcollections=**} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+
+    // Default deny for all other root collections
+    match /{document=**} {
+      allow read, write: false;
+    }
+  }
+}

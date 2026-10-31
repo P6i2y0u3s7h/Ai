@@ -1,0 +1,9 @@
+{
+  "studyMode": "study",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Explain what a Binary Search Tree is in 2 concise sentences."
+    }
+  ]
+}
