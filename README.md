@@ -85,11 +85,25 @@ npm run dev
 - `npm run dev:frontend`: Starts only the Vite frontend dev server.
 - `npm run dev:server`: Starts only the Express AI backend server.
 - `npm test`: Runs the automated test suite (isolation verification, Groq rate limiting, and study tools).
-- `npm run build`: Type-checks and creates the production bundle.
+- `npm run build`: Type-checks and creates the production bundle with optimized vendor chunks.
 - `npm run preview`: Locally previews the production build.
+
+---
+
+## Deployment (Vercel)
+
+This project is ready for one-click deployment to [Vercel](https://vercel.com):
+1. Import repository `P6i2y0u3s7h/Ai` into Vercel.
+2. Set Environment Variables:
+   - `AI_PROVIDER=groq`
+   - `GROQ_API_KEY=your_groq_api_key`
+   - `GROQ_MODEL=qwen/qwen3.8-27b`
+   - `VITE_FIREBASE_API_KEY`, `VITE_FIREBASE_PROJECT_ID`, etc.
+3. Deploy! The `/api` serverless functions and Vite frontend deploy together automatically.
 
 ---
 
 ## License
 
 MIT
+
