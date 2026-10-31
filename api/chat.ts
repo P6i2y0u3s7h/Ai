@@ -1,5 +1,4 @@
 import type { IncomingMessage, ServerResponse } from 'http';
-import dotenv from 'dotenv';
 import { verifyAuthToken } from './_lib/auth';
 import { checkRateLimit } from './_lib/rateLimit';
 import { buildSystemPrompt } from './_lib/prompts';
@@ -13,7 +12,7 @@ import {
   clearInFlight
 } from './_lib/groq';
 
-dotenv.config();
+
 
 interface RequestWithBody extends IncomingMessage {
   body?: any;

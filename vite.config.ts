@@ -38,5 +38,37 @@ export default defineConfig({
         secure: false
       }
     }
+  },
+  build: {
+    chunkSizeWarningLimit: 600,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('firestore')) {
+              return 'vendor-firestore';
+            }
+            if (id.includes('@firebase/auth') || id.includes('firebase/auth')) {
+              return 'vendor-auth';
+            }
+            if (id.includes('firebase')) {
+              return 'vendor-firebase';
+            }
+            if (id.includes('react-markdown') || id.includes('remark-gfm') || id.includes('unified') || id.includes('micromark')) {
+              return 'vendor-markdown';
+            }
+            if (id.includes('framer-motion')) {
+              return 'vendor-framer-motion';
+            }
+            if (id.includes('lucide-react')) {
+              return 'vendor-icons';
+            }
+            if (id.includes('react') || id.includes('react-dom') || id.includes('scheduler')) {
+              return 'vendor-react';
+            }
+          }
+        }
+      }
+    }
   }
 });
