@@ -21,7 +21,6 @@ export const AuthScreen: React.FC = () => {
     signIn,
     signUp,
     resetPassword,
-    loginAsGuest,
     authError,
     clearAuthError,
     loading,
@@ -242,18 +241,6 @@ export const AuthScreen: React.FC = () => {
             )}
           </button>
         </form>
-
-        {/* Quick Demo Student Mode Button */}
-        <div className="mt-4 pt-4 border-t border-[#262626]">
-          <button
-            type="button"
-            onClick={() => loginAsGuest('Alex Morgan')}
-            className="w-full py-2.5 px-3 rounded-xl bg-[#141414] hover:bg-[#1C1C1C] text-white text-xs font-semibold border border-[#262626] transition-colors flex items-center justify-center gap-2"
-          >
-            <Sparkles size={14} className="text-white" />
-            <span>Continue as Guest Student (Demo)</span>
-          </button>
-        </div>
 
         {/* Footer Mode Switchers */}
         <div className="mt-5 text-center text-xs text-[#A1A1AA]">
