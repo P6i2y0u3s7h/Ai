@@ -8,8 +8,13 @@ export const config = {
 };
 
 export default async function handler(req: IncomingMessage, res: ServerResponse) {
-  const origin = req.headers.origin || '*';
-  res.setHeader('Access-Control-Allow-Origin', origin);
+  const origin = req.headers.origin;
+  if (origin) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+  } else {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+  }
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 

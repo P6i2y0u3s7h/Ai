@@ -6,20 +6,9 @@ interface RateLimitRecord {
 const rateLimitMap = new Map<string, RateLimitRecord>();
 
 /**
- * Clean up expired rate limit entries periodically
- */
-setInterval(() => {
-  const now = Date.now();
-  for (const [key, record] of rateLimitMap.entries()) {
-    if (now > record.resetAt) {
-      rateLimitMap.delete(key);
-    }
-  }
-}, 60 * 1000).unref?.();
-
-/**
  * Checks and increments rate limit for an identifier (e.g. client IP or userId)
  * Defaults to 30 requests per 10 minutes (tailored for Groq free-tier 30 RPM limit)
+ * Uses lazy cleanup without top-level timers to ensure compatibility with serverless environments.
  */
 export function checkRateLimit(
   key: string,
@@ -27,6 +16,16 @@ export function checkRateLimit(
   windowMs: number = 10 * 60 * 1000
 ): { allowed: boolean; remaining: number; resetInMs: number } {
   const now = Date.now();
+
+  // Lazy cleanup of expired entries (prevents event loop hanging in serverless functions)
+  if (rateLimitMap.size > 200) {
+    for (const [k, record] of rateLimitMap.entries()) {
+      if (now > record.resetAt) {
+        rateLimitMap.delete(k);
+      }
+    }
+  }
+
   const record = rateLimitMap.get(key);
 
   if (!record || now > record.resetAt) {
@@ -56,4 +55,3 @@ export function checkRateLimit(
     resetInMs: record.resetAt - now
   };
 }
-

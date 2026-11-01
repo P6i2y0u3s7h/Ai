@@ -21,11 +21,15 @@ interface RequestWithBody extends IncomingMessage {
 export default async function handler(req: RequestWithBody, res: ServerResponse) {
   console.log('[CHAT] Request received');
   // 1. CORS Headers
-  const origin = req.headers.origin || '*';
-  res.setHeader('Access-Control-Allow-Origin', origin);
+  const origin = req.headers.origin;
+  if (origin) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+  } else {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+  }
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
 
   if (req.method === 'OPTIONS') {
     res.statusCode = 204;
@@ -45,7 +49,7 @@ export default async function handler(req: RequestWithBody, res: ServerResponse)
 
   try {
     // 2. Client IP Rate Limiting (30 requests / 10 min window)
-    const clientIp = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || req.socket.remoteAddress || 'unknown';
+    const clientIp = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || req.socket?.remoteAddress || (req as any).connection?.remoteAddress || 'unknown';
     const rateLimitResult = checkRateLimit(clientIp, 30, 10 * 60 * 1000);
     if (!rateLimitResult.allowed) {
       res.statusCode = 429;
@@ -77,7 +81,7 @@ export default async function handler(req: RequestWithBody, res: ServerResponse)
 
     // 4. Parse JSON body (handles pre-parsed object or incoming raw stream)
     let body = req.body;
-    if (!body) {
+    if (!body && typeof (req as any)[Symbol.asyncIterator] === 'function' && !req.readableEnded) {
       try {
         const buffers: Buffer[] = [];
         for await (const chunk of req) {
@@ -86,10 +90,7 @@ export default async function handler(req: RequestWithBody, res: ServerResponse)
         const rawText = Buffer.concat(buffers).toString('utf8');
         body = rawText ? JSON.parse(rawText) : {};
       } catch {
-        res.statusCode = 400;
-        res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify({ error: 'Malformed JSON payload.', code: 'VALIDATION_ERROR', statusCode: 400 }));
-        return;
+        body = {};
       }
     } else if (typeof body === 'string') {
       try {
@@ -101,6 +102,7 @@ export default async function handler(req: RequestWithBody, res: ServerResponse)
         return;
       }
     }
+    body = body || {};
 
     const { messages, studyMode = 'general', options = {} } = body;
 
@@ -300,6 +302,7 @@ export default async function handler(req: RequestWithBody, res: ServerResponse)
     res.setHeader('Cache-Control', 'no-cache, no-transform');
     res.setHeader('Connection', 'keep-alive');
     res.setHeader('X-Accel-Buffering', 'no');
+    (res as any).flushHeaders?.();
 
     const reader = upstreamResp.body?.getReader();
     if (!reader) {
@@ -361,6 +364,9 @@ export default async function handler(req: RequestWithBody, res: ServerResponse)
       }
     }
   } finally {
+    if (connectionTimeoutId) {
+      clearTimeout(connectionTimeoutId);
+    }
     if (inFlightKey) {
       clearInFlight(inFlightKey);
     }

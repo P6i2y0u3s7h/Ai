@@ -8,8 +8,13 @@ interface RequestWithQueryAndBody extends IncomingMessage {
 }
 
 export default async function handler(req: RequestWithQueryAndBody, res: ServerResponse) {
-  const origin = req.headers.origin || '*';
-  res.setHeader('Access-Control-Allow-Origin', origin);
+  const origin = req.headers.origin;
+  if (origin) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+  } else {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+  }
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
@@ -26,9 +31,10 @@ export default async function handler(req: RequestWithQueryAndBody, res: ServerR
     return;
   }
 
-  // Rate Limiting Check (60 searches per 5 min)
-  const clientIp = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || req.socket.remoteAddress || 'unknown';
-  const rateLimitResult = checkRateLimit(`search:${clientIp}`, 60, 5 * 60 * 1000);
+  try {
+    // Rate Limiting Check (60 searches per 5 min)
+    const clientIp = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || req.socket?.remoteAddress || (req as any).connection?.remoteAddress || 'unknown';
+    const rateLimitResult = checkRateLimit(`search:${clientIp}`, 60, 5 * 60 * 1000);
   if (!rateLimitResult.allowed) {
     res.statusCode = 429;
     res.setHeader('Content-Type', 'application/json');
@@ -145,4 +151,16 @@ export default async function handler(req: RequestWithQueryAndBody, res: ServerR
       documents: []
     }
   }));
+  } catch (err: any) {
+    console.error('[API /api/search error]:', err);
+    if (!res.headersSent) {
+      res.statusCode = 500;
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify({
+        error: `Server error: ${err.message || 'Failed to process search.'}`,
+        code: 'SERVER_ERROR',
+        statusCode: 500
+      }));
+    }
+  }
 }
