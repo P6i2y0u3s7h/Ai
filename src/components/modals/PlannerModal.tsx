@@ -496,10 +496,10 @@ Add a motivational tip at the end. Keep it concise, practical, and achievable.`;
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm select-none">
-      <div className="w-full max-w-xl bg-[#0A0A0A] border border-[#262626] rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
+    <div className="fixed inset-0 z-[60] w-screen h-screen bg-[#0A0A0A] flex flex-col overflow-hidden select-none">
+      <div className="w-full h-full bg-[#0A0A0A] flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-[#262626]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#262626] bg-[#0D0D0D]">
           <div className="flex items-center gap-2.5">
             <div className="p-2 rounded-xl bg-[#141414] text-white border border-[#262626]">
               <CalendarDays size={18} />
@@ -523,7 +523,7 @@ Add a motivational tip at the end. Keep it concise, practical, and achievable.`;
 
         {/* Tab bar (only on overview) */}
         {view === 'overview' && (
-          <div className="flex border-b border-[#262626] px-4 bg-[#0A0A0A]">
+          <div className="flex border-b border-[#262626] px-6 bg-[#0D0D0D]">
             {[
               { v: 'tasks' as const, label: 'Tasks' },
               { v: 'schedule' as const, label: 'AI Schedule' },
@@ -538,9 +538,13 @@ Add a motivational tip at the end. Keep it concise, practical, and achievable.`;
         )}
 
         {/* Content */}
-        {view === 'overview' && renderOverview()}
-        {view === 'tasks'    && renderTasks()}
-        {view === 'schedule' && renderSchedule()}
+        <div className="flex-1 overflow-y-auto">
+          <div className="max-w-4xl mx-auto w-full p-6">
+            {view === 'overview' && renderOverview()}
+            {view === 'tasks'    && renderTasks()}
+            {view === 'schedule' && renderSchedule()}
+          </div>
+        </div>
       </div>
     </div>
   );

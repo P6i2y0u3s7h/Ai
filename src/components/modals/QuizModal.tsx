@@ -326,7 +326,7 @@ Return ONLY a valid JSON array:
 
   return (
     <div
-      className="fixed inset-0 z-[60] flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-md"
+      className="fixed inset-0 z-[60] w-screen h-screen bg-[#0A0A0A] flex flex-col overflow-hidden"
       onKeyDown={e => {
         if (e.key === 'Escape') {
           e.stopPropagation();
@@ -334,7 +334,7 @@ Return ONLY a valid JSON array:
         }
       }}
     >
-      <div className="w-full max-w-[1240px] h-[92vh] bg-[#0A0A0A] border border-[#262626] rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+      <div className="w-full h-full bg-[#0A0A0A] flex flex-col overflow-hidden">
         
         {/* ── Top Header ── */}
         <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#262626] bg-[#0D0D0D]">

@@ -130,10 +130,10 @@ export const DocumentsModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md select-none">
-      <div className="w-full max-w-2xl bg-[#0A0A0A] border border-[#262626] rounded-2xl shadow-2xl flex flex-col max-h-[88vh] overflow-hidden">
+    <div className="fixed inset-0 z-[60] w-screen h-screen bg-[#0A0A0A] flex flex-col overflow-hidden select-none">
+      <div className="w-full h-full bg-[#0A0A0A] flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-[#262626]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#262626] bg-[#0D0D0D]">
           <div className="flex items-center gap-2.5">
             <div className="p-2 rounded-xl bg-[#141414] text-white border border-[#262626]">
               <FileText size={18} />
@@ -153,11 +153,14 @@ export const DocumentsModal: React.FC = () => {
           </button>
         </div>
 
-        {/* Upload Dropzone */}
-        <div className="p-4 sm:p-5 border-b border-[#262626]">
-          <input
-            type="file"
-            ref={fileInputRef}
+        {/* Inner Centered Scrollable Area */}
+        <div className="flex-1 overflow-y-auto">
+          <div className="max-w-4xl mx-auto w-full">
+            {/* Upload Dropzone */}
+            <div className="p-4 sm:p-5 border-b border-[#262626]">
+              <input
+                type="file"
+                ref={fileInputRef}
             onChange={handleFileUpload}
             multiple
             accept=".pdf,application/pdf"
@@ -421,6 +424,8 @@ export const DocumentsModal: React.FC = () => {
             </div>
           </div>
         )}
+          </div>
+        </div>
       </div>
     </div>
   );
