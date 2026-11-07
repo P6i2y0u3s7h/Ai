@@ -243,5 +243,198 @@ ${content.slice(0, 4000)}
         back: content.slice(0, 150) + '...'
       }
     ];
+  },
+
+  /**
+   * Generates a full set of exam-grade QuizQuestions directly from a note
+   */
+  async generateQuizFromNote(title: string, content: string, count = 5): Promise<Array<{
+    id: string;
+    question: string;
+    options: string[];
+    correctIndex: number;
+    explanation: string;
+  }>> {
+    const prompt = `You are StudyAI. Generate exactly ${count} multiple-choice exam questions based directly on this study note: "${title}".
+Output ONLY a valid JSON array in this exact format (no markdown fences, no surrounding commentary):
+[
+  {
+    "id": "q1",
+    "question": "Clear conceptual question?",
+    "options": ["Option A", "Option B", "Option C", "Option D"],
+    "correctIndex": 0,
+    "explanation": "Why this answer is correct and others are incorrect."
+  }
+]
+
+Note Content:
+"""
+${content.slice(0, 4000)}
+"""`;
+
+    let rawOutput = '';
+    await streamAiResponse({
+      messages: [{ role: 'user', content: prompt }],
+      studyMode: 'mcq',
+      onChunk: (_delta, fullText) => {
+        rawOutput = fullText;
+      }
+    });
+
+    try {
+      const jsonMatch = rawOutput.match(/\[[\s\S]*\]/);
+      if (jsonMatch) {
+        const parsed = JSON.parse(jsonMatch[0]);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed.map((q: any, i: number) => ({
+            id: `note-q-${Date.now()}-${i}`,
+            question: String(q.question || `Question ${i + 1}`).trim(),
+            options: Array.isArray(q.options) && q.options.length >= 2 ? q.options.map(String) : ['True', 'False', 'Not enough info', 'None'],
+            correctIndex: typeof q.correctIndex === 'number' && q.correctIndex >= 0 && q.correctIndex < (q.options?.length || 4) ? q.correctIndex : 0,
+            explanation: String(q.explanation || 'Based on core principles from the note.').trim()
+          }));
+        }
+      }
+    } catch {}
+
+    // Fallback if AI stream failed to format pure JSON
+    return [
+      {
+        id: `note-q-${Date.now()}-0`,
+        question: `Which key concept is most central to ${title}?`,
+        options: [
+          `Fundamental principles of ${title}`,
+          'Unrelated secondary facts',
+          'Historical background only',
+          'None of the above'
+        ],
+        correctIndex: 0,
+        explanation: `The study note emphasizes the primary mechanisms and foundational concepts of ${title}.`
+      }
+    ];
+  },
+
+  /**
+   * Summarizes arbitrary text with key points and definitions
+   */
+  async summarizeText(text: string): Promise<string> {
+    const prompt = `You are StudyAI Summarizer. Analyze the text below and provide a structured, high-yield summary:
+1. **Executive Overview (2 sentences)**
+2. **Key Takeaways (5 bullet points)**
+3. **Core Definitions & Formulas**
+4. **Important Review Questions**
+
+Text:
+"""
+${text.slice(0, 5000)}
+"""`;
+
+    let result = '';
+    await streamAiResponse({
+      messages: [{ role: 'user', content: prompt }],
+      studyMode: 'general',
+      onChunk: (_delta, fullText) => {
+        result = fullText;
+      }
+    });
+
+    return result.trim();
+  },
+
+  /**
+   * Explains any topic step by step with real-world examples in English or Hinglish
+   */
+  async explainTopic(topic: string, subject = 'General', language: 'english' | 'hinglish' = 'english'): Promise<string> {
+    const isHinglish = language === 'hinglish';
+    const prompt = isHinglish
+      ? `You are StudyAI Topic Explainer. Explain "${topic}" (Subject: ${subject}) in friendly conversational Hinglish (Hindi + English in Roman script).
+Structure:
+1. **Easy Intuition & What it is (Aasan Bhasha Mein)**
+2. **Step-by-Step Working & Core Logic**
+3. **Real-Life Example (Asli Duniya Ka Example)**
+4. **Exam Questions & Common Confusions (Dhyan Rakhne Wali Baatein)**
+Keep technical terms in English, explanations in friendly Roman Hindi.`
+      : `You are StudyAI Topic Explainer. Explain "${topic}" (Subject: ${subject}) clearly step-by-step.
+Structure:
+1. **Intuitive Overview (ELI5)**
+2. **Step-by-Step Deep Dive**
+3. **Real-World Practical Example & Analogy**
+4. **Key Equations / Principles**
+5. **Common Mistakes & Exam Pro-Tips**`;
+
+    let result = '';
+    await streamAiResponse({
+      messages: [{ role: 'user', content: prompt }],
+      studyMode: 'study',
+      onChunk: (_delta, fullText) => {
+        result = fullText;
+      }
+    });
+
+    return result.trim();
+  },
+
+  /**
+   * Explains code line by line, identifies bugs, and provides corrected examples
+   */
+  async explainCode(code: string, language = 'General Programming'): Promise<string> {
+    const prompt = `You are StudyAI Code Explainer. Analyze the following code (${language}):
+1. **High-Level Purpose & Algorithm**
+2. **Line-by-Line Breakdown**
+3. **Time & Space Complexity Analysis**
+4. **Potential Bugs, Edge Cases & Performance Bottlenecks**
+5. **Clean / Optimized Code Solution with Comments**
+
+Code:
+\`\`\`
+${code.slice(0, 4000)}
+\`\`\``;
+
+    let result = '';
+    await streamAiResponse({
+      messages: [{ role: 'user', content: prompt }],
+      studyMode: 'study',
+      onChunk: (_delta, fullText) => {
+        result = fullText;
+      }
+    });
+
+    return result.trim();
+  },
+
+  /**
+   * Generates AI performance analytics and personalized study recommendations
+   */
+  async analyzePerformance(sessions: any[]): Promise<string> {
+    const summaryData = sessions.slice(0, 10).map(s => ({
+      title: s.title,
+      subject: s.subject || 'General',
+      score: `${s.score}/${s.total}`,
+      pct: Math.round((s.score / s.total) * 100),
+      date: new Date(s.date).toLocaleDateString()
+    }));
+
+    const prompt = `You are StudyAI Academic Performance Advisor. Based on the student's recent quiz performance data:
+${JSON.stringify(summaryData, null, 2)}
+
+Provide an encouraging, data-backed academic performance analysis:
+1. **Overall Performance Diagnostic**
+2. **Identified Strong Topics (Keep it up)**
+3. **Identified Weak Topics Needing Revision**
+4. **Targeted 3-Step Study Plan for Improvement**
+5. **Recommended Revision Technique (Active Recall, Spaced Repetition)**
+Keep it motivational, structured, and practical for university exams.`;
+
+    let result = '';
+    await streamAiResponse({
+      messages: [{ role: 'user', content: prompt }],
+      studyMode: 'general',
+      onChunk: (_delta, fullText) => {
+        result = fullText;
+      }
+    });
+
+    return result.trim();
   }
 };
+

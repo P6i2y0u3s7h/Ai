@@ -104,6 +104,8 @@ export interface StudyNote {
   subject?: string;
   topic?: string;
   semester?: string;
+  folder?: string;
+  isBookmarked?: boolean;
   conversationTitle?: string;
   createdAt: number;
   updatedAt?: number;
@@ -134,6 +136,7 @@ export interface QuizQuestion {
   options: string[];
   correctIndex: number;
   explanation: string;
+  topic?: string;
 }
 
 export interface QuizSession {
@@ -145,8 +148,13 @@ export interface QuizSession {
   date: number;
   score: number;
   total: number;
+  timeSpentSeconds?: number;
+  difficulty?: 'easy' | 'medium' | 'hard';
+  quizType?: 'mcq' | 'mock' | 'notes-generated';
   userAnswers?: Record<number, number>;
   questions: QuizQuestion[];
+  weakTopics?: string[];
+  aiAnalysis?: string;
 }
 
 export interface Flashcard {

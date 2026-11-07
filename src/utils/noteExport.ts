@@ -158,3 +158,4 @@ export function downloadNoteAsPdf(note: StudyNote) {
 
   printWindow.document.close();
 }
+

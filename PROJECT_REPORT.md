@@ -252,3 +252,4 @@ Total: 25 Passed, 0 Failed (100% Success Rate)
 1. **Audio Lecture Transcription**: Integration of Groq Whisper API for transcribing lecture audio recordings into structured study notes.
 2. **Formula OCR**: Handwriting recognition to convert handwritten notes and whiteboard equations into formatted LaTeX.
 3. **Collaborative Study Rooms**: Real-time peer quiz competitions powered by Firebase Realtime Database.
+

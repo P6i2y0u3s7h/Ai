@@ -175,6 +175,8 @@ export const firestoreService = {
         subject: note.subject || 'General',
         topic: note.topic || '',
         semester: note.semester || 'All Semesters',
+        folder: note.folder || 'General Notes',
+        isBookmarked: Boolean(note.isBookmarked),
         conversationTitle: note.conversationTitle || null,
         createdAt: note.createdAt || Date.now(),
         updatedAt: Date.now(),
@@ -213,17 +215,23 @@ export const firestoreService = {
   },
 
   // ==========================================
-  // 4. Quizzes (users/{userId}/quizzes/{quizId})
+  // 4. Quizzes (users/{userId}/quizzes/{quizId} & quizResults)
   // ==========================================
   async saveQuiz(userId: string, quiz: QuizSession): Promise<void> {
     if (!isFirebaseConfigured || !userId) return;
     try {
       const quizRef = doc(db, 'users', userId, 'quizzes', quiz.id);
-      await setDoc(quizRef, {
+      const payload = {
         ...quiz,
         userId,
-        date: quiz.date || Date.now()
-      }, { merge: true });
+        date: quiz.date || Date.now(),
+        updatedAt: Date.now()
+      };
+      await setDoc(quizRef, payload, { merge: true });
+
+      // Mirror to quizResults for analytics tracking
+      const resultRef = doc(db, 'users', userId, 'quizResults', quiz.id);
+      await setDoc(resultRef, payload, { merge: true });
     } catch (e) {
       console.warn('Firestore saveQuiz error:', e);
     }
@@ -251,6 +259,8 @@ export const firestoreService = {
     try {
       const quizRef = doc(db, 'users', userId, 'quizzes', quizId);
       await deleteDoc(quizRef);
+      const resultRef = doc(db, 'users', userId, 'quizResults', quizId);
+      await deleteDoc(resultRef);
     } catch (e) {
       console.warn('Firestore deleteQuiz error:', e);
     }
