@@ -7,10 +7,9 @@ import {
   MicOff,
   X,
   FileText,
-  Image as ImageIcon,
-  Languages
+  Image as ImageIcon
 } from 'lucide-react';
-import { Attachment, StudyLanguage } from '../../types/chat';
+import { Attachment } from '../../types/chat';
 import { useChat } from '../../context/ChatContext';
 import { STUDY_MODES } from './StudyModeSelector';
 import { ExamPreparationPanel } from './ExamPreparationPanel';
@@ -22,8 +21,6 @@ export const MessageComposer: React.FC = () => {
     isStreaming,
     stopGeneration,
     studyMode,
-    language,
-    setLanguage,
     showToast,
     activeDocument,
     setActiveDocumentId,
@@ -346,26 +343,9 @@ export const MessageComposer: React.FC = () => {
         </div>
       </form>
 
-      {/* Footer bar with Language Selector & Notice */}
-      <div className="flex items-center justify-between mt-2 px-1 text-[11px] text-[#71717A]">
-        <div className="flex items-center gap-1.5">
-          <Languages size={13} className="text-[#A1A1AA]" />
-          <span className="text-[#A1A1AA]">Language:</span>
-          <button
-            type="button"
-            onClick={() => {
-              const next: StudyLanguage = language === 'english' ? 'hinglish' : 'english';
-              setLanguage(next);
-              showToast(`Language set to: ${next === 'hinglish' ? 'Hinglish (Hindi+English)' : 'Easy English'}`);
-            }}
-            className="px-2 py-0.5 rounded-full text-[11px] font-medium transition-colors border bg-[#141414] border-[#262626] text-zinc-300 hover:text-white hover:bg-[#1C1C1C]"
-            title="Click to toggle between Easy English and Hinglish"
-          >
-            {language === 'hinglish' ? '🇮🇳 Hinglish' : '🇬🇧 Easy English'}
-          </button>
-        </div>
-
-        <span className="hidden sm:inline font-normal">
+      {/* Footer disclaimer notice */}
+      <div className="flex items-center justify-center mt-2 px-1 text-[11px] text-[#71717A]">
+        <span className="font-normal text-center">
           Ai can make mistakes. Verify important formulas & exam facts.
         </span>
       </div>
