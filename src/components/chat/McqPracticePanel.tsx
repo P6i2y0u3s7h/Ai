@@ -6,13 +6,14 @@ import {
   ChevronUp,
   ShieldCheck,
   EyeOff,
-  BookOpen
+  BookOpen,
+  X
 } from 'lucide-react';
 import { McqConfig } from '../../types/chat';
 import { useChat } from '../../context/ChatContext';
 
 export const McqPracticePanel: React.FC = () => {
-  const { mcqConfig, setMcqConfig, sendMessage, isStreaming, showToast } = useChat();
+  const { mcqConfig, setMcqConfig, sendMessage, isStreaming, showToast, setStudyMode } = useChat();
   const [isExpanded, setIsExpanded] = useState(false);
 
   const handleGenerate = () => {
@@ -31,18 +32,18 @@ export const McqPracticePanel: React.FC = () => {
   };
 
   return (
-    <div className="w-full max-w-[800px] mx-auto px-3 sm:px-4 mb-2">
+    <div className="w-full mb-2">
       <div className="rounded-2xl bg-[#141414] border border-[#262626] p-2.5 sm:p-3.5 shadow-md">
         {/* Header Bar */}
-        <div
-          className="flex items-center justify-between gap-2 cursor-pointer select-none"
-          onClick={() => setIsExpanded(prev => !prev)}
-        >
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-lg bg-[#0A0A0A] text-white flex items-center justify-center border border-[#262626]">
+        <div className="flex items-center justify-between gap-2 select-none">
+          <div
+            className="flex items-center gap-2 cursor-pointer flex-1 min-w-0"
+            onClick={() => setIsExpanded(prev => !prev)}
+          >
+            <div className="w-6 h-6 rounded-lg bg-[#0A0A0A] text-white flex items-center justify-center border border-[#262626] flex-shrink-0">
               <FileQuestion size={14} />
             </div>
-            <div>
+            <div className="truncate">
               <span className="text-xs font-semibold text-white">
                 MCQ Practice Center
               </span>
@@ -52,13 +53,25 @@ export const McqPracticePanel: React.FC = () => {
             </div>
           </div>
 
-          <button
-            type="button"
-            className="p-1 rounded-lg text-zinc-400 hover:text-white transition-colors"
-            aria-label="Toggle MCQ panel"
-          >
-            {isExpanded ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
-          </button>
+          <div className="flex items-center gap-1 flex-shrink-0">
+            <button
+              type="button"
+              onClick={() => setIsExpanded(prev => !prev)}
+              className="p-1 rounded-lg text-zinc-400 hover:text-white transition-colors"
+              aria-label="Toggle MCQ panel"
+            >
+              {isExpanded ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
+            </button>
+            <button
+              type="button"
+              onClick={() => setStudyMode('general')}
+              className="p-1 rounded-lg text-zinc-400 hover:text-white transition-colors"
+              title="Dismiss MCQ Practice"
+              aria-label="Dismiss MCQ Practice"
+            >
+              <X size={14} />
+            </button>
+          </div>
         </div>
 
         {/* Configuration Options */}

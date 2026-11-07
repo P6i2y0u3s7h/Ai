@@ -36,12 +36,12 @@ export const AppLayout: React.FC = () => {
   }, [setSidebarCollapsed, setActiveModal]);
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-black text-[#FFFFFF] font-sans antialiased">
+    <div className="flex h-full h-[100dvh] w-full overflow-hidden bg-black text-[#FFFFFF] font-sans antialiased fixed inset-0">
       {/* Left Sidebar */}
       <Sidebar />
 
       {/* Main Conversation Workspace */}
-      <main className="flex-1 flex flex-col h-full overflow-hidden bg-black relative">
+      <main className="flex-1 flex flex-col h-full min-h-0 overflow-hidden bg-black relative">
         {/* Top Header */}
         <ChatHeader />
 

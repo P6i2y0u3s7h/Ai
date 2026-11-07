@@ -26,7 +26,12 @@ export const MessageList: React.FC = () => {
   };
 
   const scrollToBottom = (behavior: ScrollBehavior = 'smooth') => {
-    messagesEndRef.current?.scrollIntoView({ behavior });
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({
+        top: scrollContainerRef.current.scrollHeight,
+        behavior
+      });
+    }
   };
 
   // Scroll down when new messages are added or streaming updates, if user was already near bottom
@@ -72,14 +77,14 @@ export const MessageList: React.FC = () => {
           </React.Fragment>
         ))}
 
-        <div ref={messagesEndRef} className="h-4" />
+        <div ref={messagesEndRef} className="h-10 sm:h-6" />
       </div>
 
       {/* Floating scroll to bottom button */}
       {showScrollBottomButton && (
         <button
           onClick={() => scrollToBottom('smooth')}
-          className="fixed bottom-24 right-6 sm:right-10 z-20 p-2 rounded-full bg-[#27272A] hover:bg-[#323236] text-white shadow-xl border border-[#3A3A40] transition-all transform hover:scale-105"
+          className="absolute bottom-3 right-3 sm:right-6 z-20 p-2 rounded-full bg-[#27272A] hover:bg-[#323236] text-white shadow-xl border border-[#3A3A40] transition-all transform hover:scale-105"
           title="Scroll to bottom"
           aria-label="Scroll to bottom"
         >
