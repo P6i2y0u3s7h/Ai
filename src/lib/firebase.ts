@@ -1,6 +1,6 @@
 import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
 import { getAuth, Auth } from 'firebase/auth';
-import { getFirestore, Firestore } from 'firebase/firestore';
+import { getFirestore, initializeFirestore, Firestore } from 'firebase/firestore';
 import { getStorage, FirebaseStorage } from 'firebase/storage';
 
 const getEnv = (key: string): string => {
@@ -51,7 +51,13 @@ const effectiveConfig = isFirebaseConfigured
 try {
   app = getApps().length > 0 ? getApp() : initializeApp(effectiveConfig);
   auth = getAuth(app);
-  db = getFirestore(app);
+  try {
+    db = initializeFirestore(app, {
+      experimentalForceLongPolling: true,
+    });
+  } catch {
+    db = getFirestore(app);
+  }
   storage = getStorage(app);
 } catch (error) {
   console.warn('Firebase initialization notice: Running with fallback handling.', error);
@@ -65,7 +71,13 @@ try {
       appId: '1:503190898076:web:9cdfa6ca18518c1001f459',
     }, 'fallback-app');
     auth = getAuth(app);
-    db = getFirestore(app);
+    try {
+      db = initializeFirestore(app, {
+        experimentalForceLongPolling: true,
+      });
+    } catch {
+      db = getFirestore(app);
+    }
     storage = getStorage(app);
   } catch {
     auth = {} as Auth;
