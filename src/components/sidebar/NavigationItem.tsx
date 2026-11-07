@@ -24,6 +24,7 @@ export const NavigationItem: React.FC<NavigationItemProps> = ({
   if (variant === 'primary') {
     return (
       <button
+        type="button"
         onClick={onClick}
         title={isCollapsed ? label : undefined}
         className={`w-full h-10 flex items-center rounded-xl transition-all duration-200 select-none group font-medium ${
@@ -49,6 +50,7 @@ export const NavigationItem: React.FC<NavigationItemProps> = ({
 
   return (
     <button
+      type="button"
       onClick={onClick}
       title={isCollapsed ? label : undefined}
       className={`w-full h-10 flex items-center rounded-xl transition-all duration-150 select-none group text-left ${

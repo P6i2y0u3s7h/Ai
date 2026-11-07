@@ -54,6 +54,7 @@ export const ChatHeader: React.FC = () => {
       <div className="flex items-center gap-2 min-w-0">
         {/* Mobile menu trigger */}
         <button
+          type="button"
           onClick={() => setMobileSidebarOpen(true)}
           className="md:hidden p-2 text-[#A1A1AA] hover:text-white rounded-lg hover:bg-[#1C1C1C] transition-colors"
           aria-label="Open navigation drawer"
@@ -64,6 +65,7 @@ export const ChatHeader: React.FC = () => {
         {/* Desktop expand sidebar button when collapsed */}
         {sidebarCollapsed && (
           <button
+            type="button"
             onClick={() => setSidebarCollapsed(false)}
             className="hidden md:flex p-2 text-[#A1A1AA] hover:text-white rounded-lg hover:bg-[#1C1C1C] transition-colors"
             title="Expand sidebar"
@@ -87,6 +89,7 @@ export const ChatHeader: React.FC = () => {
       {/* Right controls */}
       <div className="flex items-center gap-1.5">
         <button
+          type="button"
           onClick={handleShare}
           className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs text-zinc-300 hover:text-white hover:bg-[#1C1C1C] transition-colors border border-transparent hover:border-[#262626]"
           title="Share conversation"
@@ -98,6 +101,7 @@ export const ChatHeader: React.FC = () => {
         {/* More options menu */}
         <div className="relative" ref={menuRef}>
           <button
+            type="button"
             onClick={() => setMenuOpen(prev => !prev)}
             className="p-1.5 text-[#A1A1AA] hover:text-white rounded-lg hover:bg-[#1C1C1C] transition-colors"
             title="Chat options"
@@ -108,6 +112,7 @@ export const ChatHeader: React.FC = () => {
           {menuOpen && (
             <div className="absolute right-0 top-full mt-1.5 w-48 bg-[#141414] border border-[#262626] rounded-xl shadow-2xl z-50 py-1.5 text-xs backdrop-blur-md">
               <button
+                type="button"
                 onClick={() => {
                   setActiveModal('notes');
                   setMenuOpen(false);
@@ -119,6 +124,7 @@ export const ChatHeader: React.FC = () => {
               </button>
 
               <button
+                type="button"
                 onClick={() => {
                   setActiveModal('settings');
                   setMenuOpen(false);
@@ -132,6 +138,7 @@ export const ChatHeader: React.FC = () => {
               <div className="my-1 border-t border-[#262626]" />
 
               <button
+                type="button"
                 onClick={() => {
                   clearCurrentChat();
                   setMenuOpen(false);

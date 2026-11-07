@@ -154,9 +154,15 @@ export const SearchModal: React.FC = () => {
             value={query}
             onChange={e => handleQueryChange(e.target.value)}
             onKeyDown={e => {
-              if (e.key === 'Enter' && query.trim()) {
+              e.stopPropagation();
+              if (e.key === 'Enter') {
                 e.preventDefault();
-                handleLaunchStudy(query.trim(), 'study');
+                if (query.trim()) {
+                  handleLaunchStudy(query.trim(), 'study');
+                }
+              } else if (e.key === 'Escape') {
+                e.preventDefault();
+                setActiveModal(null);
               }
             }}
             placeholder="Search conversations, topics, lecture notes, or documents..."
@@ -164,6 +170,7 @@ export const SearchModal: React.FC = () => {
           />
           {query && (
             <button
+              type="button"
               onClick={() => handleQueryChange('')}
               className="p-1 text-[#A1A1AA] hover:text-white rounded-md transition-colors"
               title="Clear search"
@@ -172,6 +179,7 @@ export const SearchModal: React.FC = () => {
             </button>
           )}
           <button
+            type="button"
             onClick={() => setActiveModal(null)}
             className="text-xs px-2.5 py-1 rounded bg-[#141414] text-[#A1A1AA] hover:text-white border border-[#262626] transition-colors"
           >
@@ -182,6 +190,7 @@ export const SearchModal: React.FC = () => {
         {/* Category Filter Tabs */}
         <div className="flex items-center gap-1 px-4 py-2 bg-[#0A0A0A] border-b border-[#262626] overflow-x-auto text-xs">
           <button
+            type="button"
             onClick={() => setActiveTab('all')}
             className={`px-3 py-1 rounded-lg font-medium transition-colors ${
               activeTab === 'all'
@@ -192,6 +201,7 @@ export const SearchModal: React.FC = () => {
             All Results ({unifiedResults.totalCount})
           </button>
           <button
+            type="button"
             onClick={() => setActiveTab('chats')}
             className={`px-3 py-1 rounded-lg font-medium transition-colors ${
               activeTab === 'chats'
@@ -202,6 +212,7 @@ export const SearchModal: React.FC = () => {
             Chats ({unifiedResults.conversations.length})
           </button>
           <button
+            type="button"
             onClick={() => setActiveTab('notes')}
             className={`px-3 py-1 rounded-lg font-medium transition-colors ${
               activeTab === 'notes'
@@ -212,6 +223,7 @@ export const SearchModal: React.FC = () => {
             Notes ({unifiedResults.notes.length})
           </button>
           <button
+            type="button"
             onClick={() => setActiveTab('documents')}
             className={`px-3 py-1 rounded-lg font-medium transition-colors ${
               activeTab === 'documents'

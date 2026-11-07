@@ -51,10 +51,32 @@ export const MessageComposer: React.FC = () => {
   }, [input]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    // Ignore IME composition events (mobile predictive keyboard, accents, IME)
+    if (e.nativeEvent.isComposing) {
+      return;
+    }
+
+    if (e.key === 'Enter') {
+      if (e.shiftKey) {
+        // Shift + Enter: Insert a new line in textarea without sending, and isolate from parents
+        e.stopPropagation();
+        return;
+      }
+
+      // Plain Enter: Prevent default form submit/newline, stop bubbling, and submit message
       e.preventDefault();
+      e.stopPropagation();
+      e.nativeEvent.stopImmediatePropagation?.();
       handleSend();
     }
+  };
+
+  const handleSubmit = (e?: React.FormEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    handleSend();
   };
 
   const handleSend = () => {
@@ -63,9 +85,10 @@ export const MessageComposer: React.FC = () => {
       return;
     }
 
-    if (!input.trim() && attachments.length === 0) return;
+    const trimmedInput = input.trim();
+    if (!trimmedInput && attachments.length === 0) return;
 
-    sendMessage(input, attachments);
+    sendMessage(trimmedInput, attachments);
     setInput('');
     setAttachments([]);
 
@@ -225,7 +248,10 @@ export const MessageComposer: React.FC = () => {
       )}
 
       {/* Floating composer container */}
-      <div className="relative rounded-[24px] bg-[#141414] border border-[#262626] focus-within:border-zinc-500 transition-all shadow-xl flex flex-col p-1.5 sm:p-2">
+      <form
+        onSubmit={handleSubmit}
+        className="relative rounded-[24px] bg-[#141414] border border-[#262626] focus-within:border-zinc-500 transition-all shadow-xl flex flex-col p-1.5 sm:p-2"
+      >
         {/* Attached files preview chips */}
         {attachments.length > 0 && (
           <div className="flex flex-wrap gap-1.5 px-2.5 pt-1.5 pb-2 border-b border-[#262626]">
@@ -304,8 +330,7 @@ export const MessageComposer: React.FC = () => {
             </button>
           ) : (
             <button
-              type="button"
-              onClick={handleSend}
+              type="submit"
               disabled={!canSend}
               className={`p-2 sm:p-2.5 rounded-full transition-all flex-shrink-0 mb-0.5 ${
                 canSend
@@ -319,7 +344,7 @@ export const MessageComposer: React.FC = () => {
             </button>
           )}
         </div>
-      </div>
+      </form>
 
       {/* Footer bar with Language Selector & Notice */}
       <div className="flex items-center justify-between mt-2 px-1 text-[11px] text-[#71717A]">

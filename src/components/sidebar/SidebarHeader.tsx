@@ -26,6 +26,7 @@ export const SidebarHeader: React.FC<SidebarHeaderProps> = ({
       {/* Header Action Buttons */}
       <div className={`flex items-center gap-1 ${isCollapsed ? 'hidden' : 'flex'}`}>
         <button
+          type="button"
           onClick={() => setActiveModal('search')}
           title="Search chats (Ctrl+K)"
           className="w-8 h-8 rounded-lg flex items-center justify-center text-[#A1A1AA] hover:text-white hover:bg-[#1C1C1C] transition-colors"
@@ -35,6 +36,7 @@ export const SidebarHeader: React.FC<SidebarHeaderProps> = ({
         </button>
 
         <button
+          type="button"
           onClick={onToggleCollapse}
           title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           className="w-8 h-8 rounded-lg flex items-center justify-center text-[#A1A1AA] hover:text-white hover:bg-[#1C1C1C] transition-colors"
@@ -46,6 +48,7 @@ export const SidebarHeader: React.FC<SidebarHeaderProps> = ({
 
       {isCollapsed && (
         <button
+          type="button"
           onClick={onToggleCollapse}
           title="Expand sidebar"
           className="mt-2 w-8 h-8 rounded-lg flex items-center justify-center text-[#A1A1AA] hover:text-white hover:bg-[#1C1C1C] transition-colors"
