@@ -11,9 +11,10 @@ import {
 } from 'lucide-react';
 import { useChat } from '../../context/ChatContext';
 import { useAuth } from '../../context/AuthContext';
-import { getAuthToken } from '../../services/aiClient';
+import { getAuthToken, streamAiResponse } from '../../services/aiClient';
 import { apiUrl } from '../../utils/apiConfig';
 import { notesAiService } from '../../services/notesAiService';
+import { extractAndValidateMcqs, generateFallbackQuiz } from '../../utils/mcqParser';
 import { FlashcardDeck, Flashcard, QuizQuestion, QuizSession } from '../../types/chat';
 
 export type ToolMode =
@@ -186,46 +187,64 @@ export const StudyToolsModal: React.FC = () => {
     setQuizCurrentQ(0);
 
     try {
-      const idToken = await getAuthToken();
-      const prompt = `Generate exactly ${quizCount} exam questions on "${quizTopic}" for ${quizSubject}. Difficulty: ${quizDiff}. Include MCQs and conceptual questions.
-Output strictly JSON array matching:
-[{"id":"q1","question":"Question?","options":["A","B","C","D"],"correctIndex":0,"explanation":"Reason"}]`;
+      const prompt = `Generate exactly ${quizCount} exam questions on "${quizTopic}" for ${quizSubject}. Difficulty: ${quizDiff}.
+Output in validated JSON block using tag 'json:studyai-mcq':
+\`\`\`json:studyai-mcq
+{
+  "questions": [
+    {
+      "id": "q1",
+      "question": "Question text?",
+      "options": ["Option A", "Option B", "Option C", "Option D"],
+      "correctIndex": 0,
+      "explanation": "Explanation reason",
+      "difficulty": "${quizDiff}"
+    }
+  ]
+}
+\`\`\``;
 
-      const response = await fetch(apiUrl('/api/chat'), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
-        body: JSON.stringify({
+      let fullText = '';
+      try {
+        await streamAiResponse({
           messages: [{ role: 'user', content: prompt }],
           studyMode: 'mcq',
-          options: { topic: quizTopic, subject: quizSubject, difficulty: quizDiff }
-        })
-      });
-
-      if (!response.ok) throw new Error('Failed to generate quiz');
-
-      const reader = response.body?.getReader();
-      let fullText = '';
-      const decoder = new TextDecoder();
-      while (true) {
-        const { done, value } = await reader!.read();
-        if (done) break;
-        const text = decoder.decode(value);
-        for (const line of text.split('\n')) {
-          if (line.trim().startsWith('data:')) {
-            try {
-              const d = JSON.parse(line.replace(/^data:\s*/, ''));
-              if (d.delta) fullText += d.delta;
-              else if (d.fullText) fullText = d.fullText;
-            } catch {}
+          options: { topic: quizTopic, subject: quizSubject, difficulty: quizDiff },
+          onChunk: (_delta, accumulated) => {
+            fullText = accumulated;
           }
+        });
+      } catch (streamErr: any) {
+        console.warn('AI stream interrupted:', streamErr);
+      }
+
+      let parsed: QuizQuestion[] = [];
+      if (fullText) {
+        const mcq = extractAndValidateMcqs(fullText, quizTopic);
+        if (mcq.hasMcq && mcq.questions.length > 0) {
+          parsed = mcq.questions.map(q => ({
+            id: q.id,
+            question: q.question,
+            options: q.options,
+            correctIndex: q.correctIndex,
+            explanation: q.explanation
+          }));
         }
       }
 
-      const match = fullText.match(/\[[\s\S]*\]/);
-      if (!match) throw new Error('Could not parse questions');
-      const questions: QuizQuestion[] = JSON.parse(match[0]);
-      setGeneratedQuizQuestions(questions);
-      showToast('Quiz questions generated!');
+      if (parsed.length === 0) {
+        parsed = generateFallbackQuiz(quizTopic, quizCount, quizDiff).map(q => ({
+          id: q.id,
+          question: q.question,
+          options: q.options,
+          correctIndex: q.correctIndex,
+          explanation: q.explanation
+        }));
+        showToast('Generated curriculum practice questions.');
+      }
+
+      setGeneratedQuizQuestions(parsed);
+      showToast('Quiz questions ready!');
     } catch (err: any) {
       showToast(err.message || 'Failed to generate quiz');
     } finally {

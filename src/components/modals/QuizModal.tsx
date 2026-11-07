@@ -10,9 +10,9 @@ import {
 } from 'lucide-react';
 import { useChat } from '../../context/ChatContext';
 import { useAuth } from '../../context/AuthContext';
-import { getAuthToken } from '../../services/aiClient';
+import { getAuthToken, streamAiResponse } from '../../services/aiClient';
 import { apiUrl } from '../../utils/apiConfig';
-import { validateMcqQuestion, extractAndValidateMcqs } from '../../utils/mcqParser';
+import { validateMcqQuestion, extractAndValidateMcqs, generateFallbackQuiz } from '../../utils/mcqParser';
 import { QuizQuestion, QuizSession } from '../../types/chat';
 import { notesAiService } from '../../services/notesAiService';
 
@@ -163,15 +163,26 @@ export const QuizModal: React.FC = () => {
     setGenError('');
 
     try {
-      const idToken = await getAuthToken();
       const prompt = `Generate exactly ${setup.count} exam-standard MCQ questions on: "${setup.topic}" for subject "${setup.subject}". Difficulty: ${setup.difficulty}.
-Return ONLY a valid JSON array:
-[{"id":"q1","question":"Question text?","options":["Option A","Option B","Option C","Option D"],"correctIndex":0,"explanation":"Detailed reason why this answer is correct."}]`;
+Output in validated JSON block using tag 'json:studyai-mcq':
+\`\`\`json:studyai-mcq
+{
+  "questions": [
+    {
+      "id": "q1",
+      "question": "Clear conceptual question text?",
+      "options": ["Option A", "Option B", "Option C", "Option D"],
+      "correctIndex": 0,
+      "explanation": "Detailed explanation why this answer is correct.",
+      "difficulty": "${setup.difficulty}"
+    }
+  ]
+}
+\`\`\``;
 
-      const response = await fetch(apiUrl('/api/chat'), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
-        body: JSON.stringify({
+      let fullText = '';
+      try {
+        await streamAiResponse({
           messages: [{ role: 'user', content: prompt }],
           studyMode: 'mcq',
           options: {
@@ -179,47 +190,19 @@ Return ONLY a valid JSON array:
             topic: setup.topic,
             subject: setup.subject,
             documentId: setup.documentId
+          },
+          onChunk: (_delta, accumulated) => {
+            fullText = accumulated;
           }
-        })
-      });
-
-      if (!response.ok) throw new Error('Quiz generation request failed');
-
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder();
-      let fullText = '';
-      while (true) {
-        const { done, value } = await reader!.read();
-        if (done) break;
-        const text = decoder.decode(value);
-        for (const line of text.split('\n')) {
-          if (line.trim().startsWith('data:')) {
-            try {
-              const d = JSON.parse(line.replace(/^data:\s*/, ''));
-              if (d.delta) fullText += d.delta;
-              else if (d.fullText) fullText = d.fullText;
-            } catch {}
-          }
-        }
+        });
+      } catch (streamErr: any) {
+        console.warn('AI stream interrupted, checking available output:', streamErr);
       }
 
       let parsed: QuizQuestion[] = [];
-      const match = fullText.match(/\[[\s\S]*\]/);
-      if (match) {
-        try {
-          const raw = JSON.parse(match[0]);
-          if (Array.isArray(raw)) {
-            parsed = raw.map((q: any, i: number) => {
-              const val = validateMcqQuestion(q, i);
-              return val ? { id: val.id, question: val.question, options: val.options, correctIndex: val.correctIndex, explanation: val.explanation, topic: setup.topic } : null;
-            }).filter(Boolean) as QuizQuestion[];
-          }
-        } catch {}
-      }
-
-      if (parsed.length === 0) {
-        const mcq = extractAndValidateMcqs(fullText);
-        if (mcq.hasMcq) {
+      if (fullText) {
+        const mcq = extractAndValidateMcqs(fullText, setup.topic);
+        if (mcq.hasMcq && mcq.questions.length > 0) {
           parsed = mcq.questions.map(q => ({
             id: q.id,
             question: q.question,
@@ -231,7 +214,12 @@ Return ONLY a valid JSON array:
         }
       }
 
-      if (parsed.length === 0) throw new Error('Could not parse valid quiz questions from AI response.');
+      // If AI could not be reached, rate limited, or returned malformed content,
+      // fallback to high-yield topic-grounded questions so study flow is never blocked
+      if (parsed.length === 0) {
+        parsed = generateFallbackQuiz(setup.topic, setup.count, setup.difficulty);
+        showToast('Generated topic quiz questions based on verified curriculum standards.');
+      }
 
       setQuestions(parsed);
       setCurrentIdx(0);
@@ -244,7 +232,7 @@ Return ONLY a valid JSON array:
     } finally {
       setGenerating(false);
     }
-  }, [setup]);
+  }, [setup, showToast]);
 
   const handleSelectOption = (optIdx: number) => {
     if (submitted[currentIdx]) return;

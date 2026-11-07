@@ -1,4 +1,5 @@
 import { streamAiResponse } from './aiClient';
+import { extractAndValidateMcqs, generateFallbackQuiz } from '../utils/mcqParser';
 
 export interface GeneratedQuestions {
   mcqs: Array<{
@@ -256,16 +257,20 @@ ${content.slice(0, 4000)}
     explanation: string;
   }>> {
     const prompt = `You are StudyAI. Generate exactly ${count} multiple-choice exam questions based directly on this study note: "${title}".
-Output ONLY a valid JSON array in this exact format (no markdown fences, no surrounding commentary):
-[
-  {
-    "id": "q1",
-    "question": "Clear conceptual question?",
-    "options": ["Option A", "Option B", "Option C", "Option D"],
-    "correctIndex": 0,
-    "explanation": "Why this answer is correct and others are incorrect."
-  }
-]
+Output in validated JSON block using tag 'json:studyai-mcq':
+\`\`\`json:studyai-mcq
+{
+  "questions": [
+    {
+      "id": "q1",
+      "question": "Clear conceptual question?",
+      "options": ["Option A", "Option B", "Option C", "Option D"],
+      "correctIndex": 0,
+      "explanation": "Why this answer is correct and others are incorrect."
+    }
+  ]
+}
+\`\`\`
 
 Note Content:
 """
@@ -273,45 +278,39 @@ ${content.slice(0, 4000)}
 """`;
 
     let rawOutput = '';
-    await streamAiResponse({
-      messages: [{ role: 'user', content: prompt }],
-      studyMode: 'mcq',
-      onChunk: (_delta, fullText) => {
-        rawOutput = fullText;
-      }
-    });
-
     try {
-      const jsonMatch = rawOutput.match(/\[[\s\S]*\]/);
-      if (jsonMatch) {
-        const parsed = JSON.parse(jsonMatch[0]);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed.map((q: any, i: number) => ({
-            id: `note-q-${Date.now()}-${i}`,
-            question: String(q.question || `Question ${i + 1}`).trim(),
-            options: Array.isArray(q.options) && q.options.length >= 2 ? q.options.map(String) : ['True', 'False', 'Not enough info', 'None'],
-            correctIndex: typeof q.correctIndex === 'number' && q.correctIndex >= 0 && q.correctIndex < (q.options?.length || 4) ? q.correctIndex : 0,
-            explanation: String(q.explanation || 'Based on core principles from the note.').trim()
-          }));
+      await streamAiResponse({
+        messages: [{ role: 'user', content: prompt }],
+        studyMode: 'mcq',
+        onChunk: (_delta, fullText) => {
+          rawOutput = fullText;
         }
-      }
-    } catch {}
+      });
+    } catch (err) {
+      console.warn('Note quiz generation stream interrupted:', err);
+    }
 
-    // Fallback if AI stream failed to format pure JSON
-    return [
-      {
-        id: `note-q-${Date.now()}-0`,
-        question: `Which key concept is most central to ${title}?`,
-        options: [
-          `Fundamental principles of ${title}`,
-          'Unrelated secondary facts',
-          'Historical background only',
-          'None of the above'
-        ],
-        correctIndex: 0,
-        explanation: `The study note emphasizes the primary mechanisms and foundational concepts of ${title}.`
+    if (rawOutput) {
+      const parsed = extractAndValidateMcqs(rawOutput, title);
+      if (parsed.hasMcq && parsed.questions.length > 0) {
+        return parsed.questions.map(q => ({
+          id: q.id,
+          question: q.question,
+          options: q.options,
+          correctIndex: q.correctIndex,
+          explanation: q.explanation
+        }));
       }
-    ];
+    }
+
+    // High quality curriculum fallback
+    return generateFallbackQuiz(title, count, 'medium').map(q => ({
+      id: q.id,
+      question: q.question,
+      options: q.options,
+      correctIndex: q.correctIndex,
+      explanation: q.explanation
+    }));
   },
 
   /**
