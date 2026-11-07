@@ -187,6 +187,11 @@ export const MessageComposer: React.FC = () => {
         className="hidden"
       />
 
+      {/* Disclaimer notice - placed at top upside of toolbar panels and searchbox */}
+      <div className="text-center text-[11px] sm:text-[12px] text-[#8E8E8E] mb-2 px-2 select-none">
+        <span>Ai can make mistakes. Check important info.</span>
+      </div>
+
       {/* Mode-Specific Educational Toolbar Panels */}
       {studyMode === 'exam' && <ExamPreparationPanel />}
       {studyMode === 'mcq' && <McqPracticePanel />}
@@ -251,11 +256,6 @@ export const MessageComposer: React.FC = () => {
           </button>
         </div>
       )}
-
-      {/* Disclaimer notice - placed above input box */}
-      <div className="text-center text-[11px] sm:text-[12px] text-[#8E8E8E] mb-2 px-2 select-none">
-        <span>Ai can make mistakes. Check important info.</span>
-      </div>
 
       {/* Floating composer container */}
       <form
