@@ -173,6 +173,8 @@ export const firestoreService = {
         title: note.title,
         content: note.content,
         subject: note.subject || 'General',
+        topic: note.topic || '',
+        semester: note.semester || 'All Semesters',
         conversationTitle: note.conversationTitle || null,
         createdAt: note.createdAt || Date.now(),
         updatedAt: Date.now(),

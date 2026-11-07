@@ -102,6 +102,8 @@ export interface StudyNote {
   title: string;
   content: string;
   subject?: string;
+  topic?: string;
+  semester?: string;
   conversationTitle?: string;
   createdAt: number;
   updatedAt?: number;

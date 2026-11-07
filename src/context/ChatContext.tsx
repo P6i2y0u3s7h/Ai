@@ -94,8 +94,8 @@ interface ChatContextType {
   triggerPersonalization: (action: PersonalizationAction, referenceMessage?: Message) => Promise<void>;
   setMessageFeedback: (messageId: string, feedback: 'up' | 'down') => void;
   saveMessageToNotes: (message: Message, customSubject?: string) => void;
-  addNote: (partial: Pick<StudyNote, 'title' | 'content' | 'subject' | 'tags'>) => void;
-  updateNote: (id: string, partial: Partial<Pick<StudyNote, 'title' | 'content' | 'subject' | 'tags'>>) => void;
+  addNote: (partial: Partial<StudyNote> & Pick<StudyNote, 'title' | 'content'>) => void;
+  updateNote: (id: string, partial: Partial<StudyNote>) => void;
   deleteNote: (id: string) => void;
   uploadDocument: (file: File) => Promise<StudyDocument>;
   addDocument: (doc: Omit<StudyDocument, 'id' | 'uploadedAt'>) => void;
@@ -823,13 +823,15 @@ The request or token limit for model \`qwen/qwen3.8-27b\` has been temporarily r
     showToast('Saved to My Notes');
   };
 
-  const addNote = (partial: Pick<StudyNote, 'title' | 'content' | 'subject' | 'tags'>) => {
+  const addNote = (partial: Partial<StudyNote> & Pick<StudyNote, 'title' | 'content'>) => {
     const newNote: StudyNote = {
       id:        `note-${Date.now()}`,
       userId:    user?.uid,
       title:     partial.title,
       content:   partial.content,
       subject:   partial.subject || 'General',
+      topic:     partial.topic || '',
+      semester:  partial.semester || 'All Semesters',
       tags:      partial.tags || [],
       createdAt: Date.now(),
       updatedAt: Date.now()
@@ -841,7 +843,7 @@ The request or token limit for model \`qwen/qwen3.8-27b\` has been temporarily r
     showToast('Note created');
   };
 
-  const updateNote = (id: string, partial: Partial<Pick<StudyNote, 'title' | 'content' | 'subject' | 'tags'>>) => {
+  const updateNote = (id: string, partial: Partial<StudyNote>) => {
     setNotes(prev => prev.map(n => {
       if (n.id !== id) return n;
       const updated = { ...n, ...partial, updatedAt: Date.now() };
