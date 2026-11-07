@@ -244,6 +244,11 @@ export const MessageComposer: React.FC = () => {
         </div>
       )}
 
+      {/* Disclaimer notice - placed above input box */}
+      <div className="text-center text-[11px] sm:text-[12px] text-[#8E8E8E] mb-2 px-2 select-none">
+        <span>Ai can make mistakes. Check important info.</span>
+      </div>
+
       {/* Floating composer container */}
       <form
         onSubmit={handleSubmit}
@@ -342,11 +347,6 @@ export const MessageComposer: React.FC = () => {
           )}
         </div>
       </form>
-
-      {/* Footer disclaimer notice - styled like ChatGPT */}
-      <div className="text-center text-[11px] sm:text-[12px] text-[#8E8E8E] mt-2 px-2 select-none">
-        <span>Ai can make mistakes. Check important info.</span>
-      </div>
     </div>
   );
 };
