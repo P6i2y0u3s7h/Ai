@@ -64,8 +64,6 @@ export const QuizModal: React.FC = () => {
   const [aiAnalysis, setAiAnalysis] = useState<string>('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
-  if (activeModal !== 'quiz') return null;
-
   // ══════════════════════════════════════════════════════════════════════════
   // Comprehensive KPI & Performance Calculations
   // ══════════════════════════════════════════════════════════════════════════
@@ -323,6 +321,8 @@ Return ONLY a valid JSON array:
       setIsAnalyzing(false);
     }
   };
+
+  if (activeModal !== 'quiz') return null;
 
   return (
     <div

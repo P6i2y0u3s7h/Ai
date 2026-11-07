@@ -122,8 +122,6 @@ export const NotesModal: React.FC = () => {
   const [newFolderName, setNewFolderName] = useState('');
   const [showAddFolder, setShowAddFolder] = useState(false);
 
-  if (activeModal !== 'notes') return null;
-
   // Discovered folders
   const allFolders = useMemo(() => {
     const set = new Set<string>(['General Notes', 'Exam Prep', 'Lecture Summaries', 'Assignments']);
@@ -437,6 +435,8 @@ export const NotesModal: React.FC = () => {
     setActiveAiTool(null);
     showToast('Saved to My Notes!');
   };
+
+  if (activeModal !== 'notes') return null;
 
   return (
     <div

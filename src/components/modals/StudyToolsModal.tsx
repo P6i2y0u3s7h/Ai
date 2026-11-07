@@ -133,8 +133,6 @@ export const StudyToolsModal: React.FC = () => {
   const [timerRunning, setTimerRunning] = useState(false);
   const [timerMode, setTimerMode] = useState<'focus' | 'break'>('focus');
 
-  if (activeModal !== 'tools') return null;
-
   const selectedDeck = flashcardDecks.find(d => d.id === selectedDeckId) || null;
   const currentCard = selectedDeck?.cards[cardIndex] || null;
 
@@ -607,6 +605,8 @@ Provide daily morning, afternoon, and evening blocks with review sessions.`;
     });
     showToast('Saved directly to My Notes!');
   };
+
+  if (activeModal !== 'tools') return null;
 
   return (
     <div

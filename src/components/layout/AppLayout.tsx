@@ -11,10 +11,11 @@ import { QuizModal } from '../modals/QuizModal';
 import { PlannerModal } from '../modals/PlannerModal';
 import { SettingsModal } from '../modals/SettingsModal';
 import { ShareModal } from '../modals/ShareModal';
+import { ErrorBoundary } from '../common/ErrorBoundary';
 import { useChat } from '../../context/ChatContext';
 
 export const AppLayout: React.FC = () => {
-  const { toastMessage } = useChat();
+  const { toastMessage, setActiveModal } = useChat();
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-black text-[#FFFFFF] font-sans antialiased">
@@ -43,15 +44,17 @@ export const AppLayout: React.FC = () => {
         )}
       </main>
 
-      {/* Feature Modals */}
-      <SearchModal />
-      <NotesModal />
-      <StudyToolsModal />
-      <DocumentsModal />
-      <QuizModal />
-      <PlannerModal />
-      <SettingsModal />
-      <ShareModal />
+      {/* Feature Modals wrapped in Error Boundary */}
+      <ErrorBoundary onReset={() => setActiveModal(null)}>
+        <SearchModal />
+        <NotesModal />
+        <StudyToolsModal />
+        <DocumentsModal />
+        <QuizModal />
+        <PlannerModal />
+        <SettingsModal />
+        <ShareModal />
+      </ErrorBoundary>
     </div>
   );
 };
