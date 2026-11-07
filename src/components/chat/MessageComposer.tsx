@@ -48,24 +48,30 @@ export const MessageComposer: React.FC = () => {
   }, [input]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    // Ignore IME composition events (mobile predictive keyboard, accents, IME)
-    if (e.nativeEvent.isComposing) {
+    const isEnter = e.key === 'Enter' || e.keyCode === 13 || e.which === 13;
+
+    if (!isEnter) return;
+
+    // Shift + Enter: Always allow natural newline in textarea without sending
+    if (e.shiftKey) {
+      e.stopPropagation();
       return;
     }
 
-    if (e.key === 'Enter') {
-      if (e.shiftKey) {
-        // Shift + Enter: Insert a new line in textarea without sending, and isolate from parents
-        e.stopPropagation();
-        return;
-      }
+    // Real IME candidate selection (Japanese/Chinese/Korean virtual IME candidate popup)
+    // Only block if keyCode is 229 or key is 'Process'.
+    // In Microsoft Edge on Windows, Microsoft Editor sets isComposing: true even for standard text, but keyCode remains 13.
+    const isImeCandidateSelection =
+      (e.keyCode === 229 || e.which === 229 || e.key === 'Process');
 
-      // Plain Enter: Prevent default form submit/newline, stop bubbling, and submit message
-      e.preventDefault();
-      e.stopPropagation();
-      e.nativeEvent.stopImmediatePropagation?.();
-      handleSend();
+    if (isImeCandidateSelection) {
+      return;
     }
+
+    // Plain Enter or Ctrl+Enter / Cmd+Enter: Prevent default newline and send message
+    e.preventDefault();
+    e.stopPropagation();
+    handleSend();
   };
 
   const handleSubmit = (e?: React.FormEvent) => {
@@ -82,7 +88,8 @@ export const MessageComposer: React.FC = () => {
       return;
     }
 
-    const trimmedInput = input.trim();
+    const currentText = input || textareaRef.current?.value || '';
+    const trimmedInput = currentText.trim();
     if (!trimmedInput && attachments.length === 0) return;
 
     sendMessage(trimmedInput, attachments);
@@ -90,6 +97,7 @@ export const MessageComposer: React.FC = () => {
     setAttachments([]);
 
     if (textareaRef.current) {
+      textareaRef.current.value = '';
       textareaRef.current.style.height = 'auto';
       textareaRef.current.focus();
     }

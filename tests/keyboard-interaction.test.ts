@@ -23,18 +23,19 @@ describe('Chat Message Input Keyboard Interaction & Isolation Tests', () => {
     };
 
     // Simulation of handleKeyDown logic in MessageComposer.tsx
-    const handleKeyDown = (e: typeof mockEvent) => {
-      if (e.nativeEvent.isComposing) return;
-      if (e.key === 'Enter') {
-        if (e.shiftKey) {
-          e.stopPropagation();
-          return;
-        }
-        e.preventDefault();
+    const handleKeyDown = (e: any) => {
+      const isEnter = e.key === 'Enter' || e.keyCode === 13 || e.which === 13;
+      if (!isEnter) return;
+      if (e.shiftKey) {
         e.stopPropagation();
-        e.nativeEvent.stopImmediatePropagation?.();
-        handleSend();
+        return;
       }
+      if (e.keyCode === 229 || e.which === 229 || e.key === 'Process') {
+        return;
+      }
+      e.preventDefault();
+      e.stopPropagation();
+      handleSend();
     };
 
     handleKeyDown(mockEvent);
@@ -64,18 +65,19 @@ describe('Chat Message Input Keyboard Interaction & Isolation Tests', () => {
       messageSent = true;
     };
 
-    const handleKeyDown = (e: typeof mockEvent) => {
-      if (e.nativeEvent.isComposing) return;
-      if (e.key === 'Enter') {
-        if (e.shiftKey) {
-          e.stopPropagation();
-          return;
-        }
-        e.preventDefault();
+    const handleKeyDown = (e: any) => {
+      const isEnter = e.key === 'Enter' || e.keyCode === 13 || e.which === 13;
+      if (!isEnter) return;
+      if (e.shiftKey) {
         e.stopPropagation();
-        e.nativeEvent.stopImmediatePropagation?.();
-        handleSend();
+        return;
       }
+      if (e.keyCode === 229 || e.which === 229 || e.key === 'Process') {
+        return;
+      }
+      e.preventDefault();
+      e.stopPropagation();
+      handleSend();
     };
 
     handleKeyDown(mockEvent);
@@ -90,7 +92,9 @@ describe('Chat Message Input Keyboard Interaction & Isolation Tests', () => {
     let messageSent = false;
 
     const mockEvent = {
-      key: 'Enter',
+      key: 'Process',
+      keyCode: 229,
+      which: 229,
       shiftKey: false,
       nativeEvent: {
         isComposing: true, // IME active (virtual keyboard selection)
@@ -104,24 +108,70 @@ describe('Chat Message Input Keyboard Interaction & Isolation Tests', () => {
       messageSent = true;
     };
 
-    const handleKeyDown = (e: typeof mockEvent) => {
-      if (e.nativeEvent.isComposing) return;
-      if (e.key === 'Enter') {
-        if (e.shiftKey) {
-          e.stopPropagation();
-          return;
-        }
-        e.preventDefault();
+    const handleKeyDown = (e: any) => {
+      const isEnter = e.key === 'Enter' || e.keyCode === 13 || e.which === 13;
+      if (!isEnter) return;
+      if (e.shiftKey) {
         e.stopPropagation();
-        e.nativeEvent.stopImmediatePropagation?.();
-        handleSend();
+        return;
       }
+      if (e.keyCode === 229 || e.which === 229 || e.key === 'Process') {
+        return;
+      }
+      e.preventDefault();
+      e.stopPropagation();
+      handleSend();
     };
 
     handleKeyDown(mockEvent);
 
     assert.equal(preventDefaultCalled, false, 'IME candidate selection must not be blocked');
     assert.equal(messageSent, false, 'Message must not send while composing words');
+  });
+
+  it('6. Microsoft Edge / Windows text prediction with isComposing: true and keyCode: 13 still submits on Enter', () => {
+    let preventDefaultCalled = false;
+    let stopPropagationCalled = false;
+    let messageSent = false;
+
+    // Microsoft Edge on Windows sets nativeEvent.isComposing: true for spellcheck, but keyCode is 13
+    const mockEdgeEvent = {
+      key: 'Enter',
+      keyCode: 13,
+      which: 13,
+      shiftKey: false,
+      nativeEvent: {
+        isComposing: true,
+        stopImmediatePropagation: () => {}
+      },
+      preventDefault: () => { preventDefaultCalled = true; },
+      stopPropagation: () => { stopPropagationCalled = true; }
+    };
+
+    const handleSend = () => {
+      messageSent = true;
+    };
+
+    const handleKeyDown = (e: any) => {
+      const isEnter = e.key === 'Enter' || e.keyCode === 13 || e.which === 13;
+      if (!isEnter) return;
+      if (e.shiftKey) {
+        e.stopPropagation();
+        return;
+      }
+      if (e.keyCode === 229 || e.which === 229 || e.key === 'Process') {
+        return;
+      }
+      e.preventDefault();
+      e.stopPropagation();
+      handleSend();
+    };
+
+    handleKeyDown(mockEdgeEvent);
+
+    assert.equal(preventDefaultCalled, true, 'Edge Enter must call preventDefault');
+    assert.equal(stopPropagationCalled, true, 'Edge Enter must stop propagation');
+    assert.equal(messageSent, true, 'Edge Enter must submit the question');
   });
 
   it('4. Send button click and Form onSubmit trigger the exact same submission pipeline', () => {
