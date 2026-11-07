@@ -343,11 +343,9 @@ export const MessageComposer: React.FC = () => {
         </div>
       </form>
 
-      {/* Footer disclaimer notice */}
-      <div className="flex items-center justify-center mt-2 px-1 text-[11px] text-[#71717A]">
-        <span className="font-normal text-center">
-          Ai can make mistakes. Verify important formulas & exam facts.
-        </span>
+      {/* Footer disclaimer notice - styled like ChatGPT */}
+      <div className="text-center text-[11px] sm:text-[12px] text-[#8E8E8E] mt-2 px-2 select-none">
+        <span>Ai can make mistakes. Check important info.</span>
       </div>
     </div>
   );
