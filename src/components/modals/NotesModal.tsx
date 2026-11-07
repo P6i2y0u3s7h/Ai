@@ -105,6 +105,7 @@ export const NotesModal: React.FC = () => {
   const [creating, setCreating] = useState(false);
   const [form, setForm] = useState<NoteFormState>(defaultForm());
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [mobileTab, setMobileTab] = useState<'folders' | 'notes' | 'ai'>('notes');
 
   // AI features state
   const [activeAiTool, setActiveAiTool] = useState<ActiveAiTool>(null);
@@ -188,6 +189,7 @@ export const NotesModal: React.FC = () => {
   const startEdit = (note: StudyNote) => {
     setEditingId(note.id);
     setCreating(false);
+    setMobileTab('notes');
     setForm({
       title: note.title || '',
       topic: note.topic || '',
@@ -204,6 +206,7 @@ export const NotesModal: React.FC = () => {
   const startCreate = () => {
     setEditingId(null);
     setCreating(true);
+    setMobileTab('notes');
     setForm({
       ...defaultForm(),
       subject: subjectFilter !== 'All' ? subjectFilter : 'General',
@@ -266,6 +269,7 @@ export const NotesModal: React.FC = () => {
     setAiQuestions(null);
     setAiFlashcards(null);
     setAiGeneratedQuiz(null);
+    setMobileTab('ai');
   };
 
   const handleRunAiGenerate = async () => {
@@ -292,6 +296,7 @@ export const NotesModal: React.FC = () => {
       });
       setCreating(true);
       setActiveAiTool(null);
+      setMobileTab('notes');
       showToast('AI Study Notes generated! Review and save.');
     } catch (err: any) {
       showToast(err.message || 'Failed to generate AI notes');
@@ -303,6 +308,7 @@ export const NotesModal: React.FC = () => {
   const handleRunSummarize = async (note: StudyNote) => {
     setTargetNote(note);
     setActiveAiTool('summary');
+    setMobileTab('ai');
     setIsAiLoading(true);
     setAiResultText('');
     try {
@@ -319,6 +325,7 @@ export const NotesModal: React.FC = () => {
   const handleRunExplain = async (note: StudyNote, lang: 'english' | 'hinglish') => {
     setTargetNote(note);
     setActiveAiTool('explain');
+    setMobileTab('ai');
     setIsAiLoading(true);
     setAiResultText('');
     try {
@@ -335,6 +342,7 @@ export const NotesModal: React.FC = () => {
   const handleRunGenerateQuestions = async (note: StudyNote) => {
     setTargetNote(note);
     setActiveAiTool('questions');
+    setMobileTab('ai');
     setIsAiLoading(true);
     setAiQuestions(null);
     try {
@@ -351,6 +359,7 @@ export const NotesModal: React.FC = () => {
   const handleRunConvertFlashcards = async (note: StudyNote) => {
     setTargetNote(note);
     setActiveAiTool('flashcards');
+    setMobileTab('ai');
     setIsAiLoading(true);
     setAiFlashcards(null);
     try {
@@ -386,6 +395,7 @@ export const NotesModal: React.FC = () => {
   const handleRunGenerateQuizFromNote = async (note: StudyNote) => {
     setTargetNote(note);
     setActiveAiTool('quiz');
+    setMobileTab('ai');
     setIsAiLoading(true);
     try {
       const questions = await notesAiService.generateQuizFromNote(note.title, note.content, 5);
@@ -451,16 +461,16 @@ export const NotesModal: React.FC = () => {
       <div className="w-full h-full bg-[#0A0A0A] flex flex-col overflow-hidden">
         
         {/* ── Top Master Header ── */}
-        <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 border-b border-[#262626] bg-[#0D0D0D]">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-[#141414] text-white border border-[#262626]">
-              <BookOpen size={20} />
+        <div className="flex items-center justify-between px-3 sm:px-6 py-3 border-b border-[#262626] bg-[#0D0D0D]">
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+            <div className="p-1.5 sm:p-2 rounded-xl bg-[#141414] text-white border border-[#262626] flex-shrink-0">
+              <BookOpen size={18} className="sm:w-5 sm:h-5" />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">My Notes — Digital Notebook</h2>
-                <span className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-[#1C1C1C] text-zinc-300 border border-[#262626]">
-                  {notes.length} notes
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <h2 className="text-sm sm:text-base md:text-lg font-bold text-white tracking-tight truncate">My Notes</h2>
+                <span className="text-[10px] sm:text-[11px] font-mono px-2 py-0.5 rounded-full bg-[#1C1C1C] text-zinc-300 border border-[#262626] flex-shrink-0">
+                  {notes.length}
                 </span>
               </div>
               <p className="text-xs text-[#A1A1AA] hidden sm:block">
@@ -469,11 +479,11 @@ export const NotesModal: React.FC = () => {
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
             <button
               type="button"
               onClick={handleOpenAiGenerate}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#1C1C1C] hover:bg-[#262626] text-white border border-[#333333] text-xs font-semibold transition-all shadow-sm"
+              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-[#1C1C1C] hover:bg-[#262626] text-white border border-[#333333] text-xs font-semibold transition-all shadow-sm"
               title="Generate full study notes with AI"
             >
               <Sparkles size={13} className="text-white" />
@@ -483,21 +493,56 @@ export const NotesModal: React.FC = () => {
             <button
               type="button"
               onClick={startCreate}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-white text-black text-xs font-semibold hover:bg-zinc-200 transition-colors shadow-sm"
+              className="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-xl bg-white text-black text-xs font-semibold hover:bg-zinc-200 transition-colors shadow-sm"
             >
               <Plus size={14} />
-              <span>Create New Note</span>
+              <span className="hidden sm:inline">Create New Note</span>
+              <span className="sm:hidden">New</span>
             </button>
 
             <button
               type="button"
               onClick={() => setActiveModal(null)}
-              className="p-1.5 text-zinc-400 hover:text-white rounded-lg hover:bg-[#1C1C1C] transition-colors ml-1"
+              className="p-1.5 text-zinc-400 hover:text-white rounded-lg hover:bg-[#1C1C1C] transition-colors ml-0.5"
               aria-label="Close notes modal"
             >
               <X size={18} />
             </button>
           </div>
+        </div>
+
+        {/* ── Mobile Tab Segmented Control (Mobile Only) ── */}
+        <div className="flex md:hidden border-b border-[#262626] bg-[#0D0D0D] p-1.5 gap-1 select-none flex-shrink-0">
+          <button
+            type="button"
+            onClick={() => setMobileTab('folders')}
+            className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors ${
+              mobileTab === 'folders' ? 'bg-white text-black shadow' : 'text-zinc-400 hover:text-white'
+            }`}
+          >
+            <Folder size={13} />
+            <span>Folders</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setMobileTab('notes')}
+            className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors ${
+              mobileTab === 'notes' ? 'bg-white text-black shadow' : 'text-zinc-400 hover:text-white'
+            }`}
+          >
+            <BookOpen size={13} />
+            <span>{creating || editingId ? 'Editor' : 'Notes'} ({filteredNotes.length})</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setMobileTab('ai')}
+            className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors ${
+              mobileTab === 'ai' ? 'bg-white text-black shadow' : 'text-zinc-400 hover:text-white'
+            }`}
+          >
+            <Sparkles size={13} />
+            <span>AI Tools</span>
+          </button>
         </div>
 
         {/* ── 3-Panel Main Area ── */}
@@ -506,7 +551,9 @@ export const NotesModal: React.FC = () => {
           {/* ══════════════════════════════════════════════════════════
               LEFT PANEL: Subjects & Folders Sidebar (Desktop / Tablet)
              ══════════════════════════════════════════════════════════ */}
-          <aside className="w-full md:w-64 border-b md:border-b-0 md:border-r border-[#262626] bg-[#0A0A0A] flex flex-col overflow-y-auto p-3 space-y-4 flex-shrink-0">
+          <aside className={`border-b md:border-b-0 md:border-r border-[#262626] bg-[#0A0A0A] flex-col overflow-y-auto p-3 space-y-4 flex-shrink-0 ${
+            mobileTab === 'folders' ? 'flex flex-1 w-full' : 'hidden md:flex md:w-64'
+          }`}>
             
             {/* Folder Organization Section */}
             <div>
@@ -553,7 +600,7 @@ export const NotesModal: React.FC = () => {
               <div className="space-y-0.5">
                 <button
                   type="button"
-                  onClick={() => setFolderFilter('All')}
+                  onClick={() => { setFolderFilter('All'); setMobileTab('notes'); }}
                   className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                     folderFilter === 'All'
                       ? 'bg-white text-black font-semibold'
@@ -568,7 +615,7 @@ export const NotesModal: React.FC = () => {
 
                 <button
                   type="button"
-                  onClick={() => setFolderFilter('Favorites')}
+                  onClick={() => { setFolderFilter('Favorites'); setMobileTab('notes'); }}
                   className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                     folderFilter === 'Favorites'
                       ? 'bg-white text-black font-semibold'
@@ -585,7 +632,7 @@ export const NotesModal: React.FC = () => {
 
                 <button
                   type="button"
-                  onClick={() => setFolderFilter('AI Generated')}
+                  onClick={() => { setFolderFilter('AI Generated'); setMobileTab('notes'); }}
                   className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                     folderFilter === 'AI Generated'
                       ? 'bg-white text-black font-semibold'
@@ -604,7 +651,7 @@ export const NotesModal: React.FC = () => {
                   <button
                     key={folder}
                     type="button"
-                    onClick={() => setFolderFilter(folder)}
+                    onClick={() => { setFolderFilter(folder); setMobileTab('notes'); }}
                     className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                       folderFilter === folder
                         ? 'bg-white text-black font-semibold'
@@ -631,7 +678,7 @@ export const NotesModal: React.FC = () => {
                 {subjectFilter !== 'All' && (
                   <button
                     type="button"
-                    onClick={() => setSubjectFilter('All')}
+                    onClick={() => { setSubjectFilter('All'); setMobileTab('notes'); }}
                     className="text-[10px] text-zinc-400 hover:text-white"
                   >
                     Reset
@@ -641,7 +688,7 @@ export const NotesModal: React.FC = () => {
               <div className="space-y-0.5">
                 <button
                   type="button"
-                  onClick={() => setSubjectFilter('All')}
+                  onClick={() => { setSubjectFilter('All'); setMobileTab('notes'); }}
                   className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                     subjectFilter === 'All'
                       ? 'bg-[#1C1C1C] text-white border border-[#2E2E2E]'
@@ -658,7 +705,7 @@ export const NotesModal: React.FC = () => {
                     <button
                       key={sub}
                       type="button"
-                      onClick={() => setSubjectFilter(sub)}
+                      onClick={() => { setSubjectFilter(sub); setMobileTab('notes'); }}
                       className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                         subjectFilter === sub
                           ? 'bg-[#1C1C1C] text-white border border-[#2E2E2E]'
@@ -682,7 +729,7 @@ export const NotesModal: React.FC = () => {
               </div>
               <select
                 value={semesterFilter}
-                onChange={e => setSemesterFilter(e.target.value)}
+                onChange={e => { setSemesterFilter(e.target.value); setMobileTab('notes'); }}
                 className="w-full bg-[#111111] text-xs text-zinc-200 py-1.5 px-2.5 rounded-lg border border-[#262626] focus:outline-none"
               >
                 {SEMESTERS.map(s => (
@@ -695,7 +742,9 @@ export const NotesModal: React.FC = () => {
           {/* ══════════════════════════════════════════════════════════
               CENTER PANEL: Notes List & Rich Editor
              ══════════════════════════════════════════════════════════ */}
-          <main className="flex-1 flex flex-col overflow-hidden bg-[#0A0A0A] border-b md:border-b-0 md:border-r border-[#262626]">
+          <main className={`flex-col overflow-hidden bg-[#0A0A0A] border-b md:border-b-0 md:border-r border-[#262626] ${
+            mobileTab === 'notes' ? 'flex flex-1 w-full' : 'hidden md:flex md:flex-1'
+          }`}>
             
             {/* Top Search & Filter Bar */}
             <div className="p-3 border-b border-[#262626] bg-[#0D0D0D] flex items-center gap-2">
@@ -817,7 +866,9 @@ export const NotesModal: React.FC = () => {
           {/* ══════════════════════════════════════════════════════════
               RIGHT PANEL: AI Learning & Transformation Power Tools
              ══════════════════════════════════════════════════════════ */}
-          <aside className="w-full md:w-80 bg-[#0C0C0C] flex flex-col overflow-y-auto p-4 flex-shrink-0">
+          <aside className={`bg-[#0C0C0C] flex-col overflow-y-auto p-4 flex-shrink-0 border-t md:border-t-0 md:border-l border-[#262626] ${
+            mobileTab === 'ai' ? 'flex flex-1 w-full' : 'hidden md:flex md:w-80'
+          }`}>
             <div className="flex items-center gap-2 pb-3 border-b border-[#262626] mb-3">
               <Sparkles size={16} className="text-white" />
               <h3 className="text-xs font-bold text-white uppercase tracking-wider">AI Study Assistant</h3>
@@ -1325,7 +1376,7 @@ const NoteRichEditor: React.FC<{
             value={form.title}
             onChange={e => setForm(p => ({ ...p, title: e.target.value }))}
             placeholder="e.g. Master Theorem & Complexity Analysis"
-            className="w-full bg-[#111111] text-sm text-white px-3.5 py-2.5 rounded-xl border border-[#262626] focus:outline-none focus:border-white font-medium"
+            className="w-full bg-[#111111] text-[16px] sm:text-sm text-white px-3.5 py-2.5 rounded-xl border border-[#262626] focus:outline-none focus:border-white font-medium"
           />
         </div>
 
@@ -1334,7 +1385,7 @@ const NoteRichEditor: React.FC<{
           <select
             value={form.subject}
             onChange={e => setForm(p => ({ ...p, subject: e.target.value }))}
-            className="w-full bg-[#111111] text-xs text-white px-3 py-2.5 rounded-xl border border-[#262626] focus:outline-none"
+            className="w-full bg-[#111111] text-[16px] sm:text-xs text-white px-3 py-2.5 rounded-xl border border-[#262626] focus:outline-none"
           >
             {subjects.map(s => <option key={s} value={s}>{s}</option>)}
           </select>
@@ -1345,7 +1396,7 @@ const NoteRichEditor: React.FC<{
           <select
             value={form.folder}
             onChange={e => setForm(p => ({ ...p, folder: e.target.value }))}
-            className="w-full bg-[#111111] text-xs text-white px-3 py-2.5 rounded-xl border border-[#262626] focus:outline-none"
+            className="w-full bg-[#111111] text-[16px] sm:text-xs text-white px-3 py-2.5 rounded-xl border border-[#262626] focus:outline-none"
           >
             {folders.map(f => <option key={f} value={f}>{f}</option>)}
           </select>
@@ -1356,7 +1407,7 @@ const NoteRichEditor: React.FC<{
           <select
             value={form.semester}
             onChange={e => setForm(p => ({ ...p, semester: e.target.value }))}
-            className="w-full bg-[#111111] text-xs text-white px-3 py-2.5 rounded-xl border border-[#262626] focus:outline-none"
+            className="w-full bg-[#111111] text-[16px] sm:text-xs text-white px-3 py-2.5 rounded-xl border border-[#262626] focus:outline-none"
           >
             {semesters.map(s => <option key={s} value={s}>{s}</option>)}
           </select>
@@ -1369,7 +1420,7 @@ const NoteRichEditor: React.FC<{
             value={form.topic}
             onChange={e => setForm(p => ({ ...p, topic: e.target.value }))}
             placeholder="e.g. Asymptotic Analysis, Chapter 2"
-            className="w-full bg-[#111111] text-xs text-white px-3 py-2.5 rounded-xl border border-[#262626] focus:outline-none"
+            className="w-full bg-[#111111] text-[16px] sm:text-xs text-white px-3 py-2.5 rounded-xl border border-[#262626] focus:outline-none"
           />
         </div>
       </div>
@@ -1471,7 +1522,7 @@ const NoteRichEditor: React.FC<{
           value={form.content}
           onChange={e => setForm(p => ({ ...p, content: e.target.value }))}
           placeholder="Write your study notes using Markdown (headings #, bullets -, formulas, code blocks)..."
-          className="w-full h-64 bg-[#111111] text-xs sm:text-sm text-zinc-200 p-4 rounded-xl border border-[#262626] focus:outline-none focus:border-white font-mono leading-relaxed"
+          className="w-full h-64 bg-[#111111] text-[16px] sm:text-sm text-zinc-200 p-4 rounded-xl border border-[#262626] focus:outline-none focus:border-white font-mono leading-relaxed"
         />
       )}
 
@@ -1484,7 +1535,7 @@ const NoteRichEditor: React.FC<{
             value={form.tags}
             onChange={e => setForm(p => ({ ...p, tags: e.target.value }))}
             placeholder="algorithms, exams, important, midterms"
-            className="w-full bg-[#111111] text-xs text-white px-3 py-2 rounded-xl border border-[#262626] focus:outline-none"
+            className="w-full bg-[#111111] text-[16px] sm:text-xs text-white px-3 py-2 rounded-xl border border-[#262626] focus:outline-none"
           />
         </div>
 

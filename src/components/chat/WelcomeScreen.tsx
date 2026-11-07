@@ -70,12 +70,12 @@ export const WelcomeScreen: React.FC = () => {
       </div>
 
       {/* Main Welcome Heading */}
-      <h1 className="text-2xl sm:text-4xl font-bold text-white tracking-tight mb-3">
+      <h1 className="text-xl sm:text-3xl md:text-4xl font-bold text-white tracking-tight mb-2 sm:mb-3">
         Your ideas deserve better answers.
       </h1>
 
       {/* Subtitle */}
-      <p className="text-sm sm:text-base text-[#A1A1AA] max-w-lg mx-auto mb-10 font-normal leading-relaxed">
+      <p className="text-xs sm:text-base text-[#A1A1AA] max-w-lg mx-auto mb-6 sm:mb-10 font-normal leading-relaxed">
         Learn, explore, and understand anything with Ai.
       </p>
 

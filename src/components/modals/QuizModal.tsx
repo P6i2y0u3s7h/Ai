@@ -864,17 +864,17 @@ Output in validated JSON block using tag 'json:studyai-mcq':
                     value={setup.topic}
                     onChange={e => setSetup(p => ({ ...p, topic: e.target.value }))}
                     placeholder="e.g. Graph Algorithms, Stoichiometry, Microeconomics..."
-                    className="w-full bg-[#141414] text-xs text-white p-2.5 rounded-xl border border-[#262626] focus:outline-none"
+                    className="w-full bg-[#141414] text-[16px] sm:text-xs text-white p-2.5 rounded-xl border border-[#262626] focus:outline-none"
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-[11px] font-semibold text-[#71717A] uppercase mb-1">Subject</label>
                     <select
                       value={setup.subject}
                       onChange={e => setSetup(p => ({ ...p, subject: e.target.value }))}
-                      className="w-full bg-[#141414] text-xs text-white p-2.5 rounded-xl border border-[#262626] focus:outline-none"
+                      className="w-full bg-[#141414] text-[16px] sm:text-xs text-white p-2.5 rounded-xl border border-[#262626] focus:outline-none"
                     >
                       {SUBJECTS.map(s => <option key={s} value={s}>{s}</option>)}
                     </select>
@@ -885,7 +885,7 @@ Output in validated JSON block using tag 'json:studyai-mcq':
                     <select
                       value={setup.difficulty}
                       onChange={e => setSetup(p => ({ ...p, difficulty: e.target.value as any }))}
-                      className="w-full bg-[#141414] text-xs text-white p-2.5 rounded-xl border border-[#262626] focus:outline-none"
+                      className="w-full bg-[#141414] text-[16px] sm:text-xs text-white p-2.5 rounded-xl border border-[#262626] focus:outline-none"
                     >
                       <option value="easy">Easy (Fundamentals)</option>
                       <option value="medium">Medium (Standard Exam)</option>
@@ -899,7 +899,7 @@ Output in validated JSON block using tag 'json:studyai-mcq':
                   <select
                     value={setup.count}
                     onChange={e => setSetup(p => ({ ...p, count: Number(e.target.value) }))}
-                    className="w-full bg-[#141414] text-xs text-white p-2.5 rounded-xl border border-[#262626] focus:outline-none"
+                    className="w-full bg-[#141414] text-[16px] sm:text-xs text-white p-2.5 rounded-xl border border-[#262626] focus:outline-none"
                   >
                     <option value={5}>5 Questions</option>
                     <option value={10}>10 Questions</option>
@@ -961,7 +961,7 @@ Output in validated JSON block using tag 'json:studyai-mcq':
                             type="button"
                             disabled={isSubmitted}
                             onClick={() => handleSelectOption(oi)}
-                            className={`w-full p-3 rounded-xl border text-left text-xs transition-colors flex items-center justify-between ${cls}`}
+                            className={`w-full min-h-[44px] p-3 rounded-xl border text-left text-xs transition-colors flex items-center justify-between ${cls}`}
                           >
                             <span>{opt}</span>
                             {isSubmitted && oi === q.correctIndex && <CheckCircle2 size={14} className="text-black" />}

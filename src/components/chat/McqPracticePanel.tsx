@@ -75,7 +75,7 @@ export const McqPracticePanel: React.FC = () => {
                   placeholder="e.g. React Hooks, Thermodynamics, Graph Algorithms"
                   value={mcqConfig.topic}
                   onChange={e => setMcqConfig(prev => ({ ...prev, topic: e.target.value }))}
-                  className="w-full px-2.5 py-1.5 rounded-xl bg-[#0A0A0A] border border-[#262626] text-xs text-white placeholder:text-zinc-600 focus:outline-none focus:border-zinc-500"
+                  className="w-full px-2.5 py-1.5 rounded-xl bg-[#0A0A0A] border border-[#262626] text-[16px] sm:text-xs text-white placeholder:text-zinc-600 focus:outline-none focus:border-zinc-500"
                 />
               </div>
 

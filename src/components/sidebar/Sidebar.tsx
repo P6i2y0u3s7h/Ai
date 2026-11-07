@@ -51,13 +51,13 @@ export const Sidebar: React.FC = () => {
       {/* Main Sidebar Element (ChatGPT-style full slide toggle) */}
       <aside
         className={`fixed md:static inset-y-0 left-0 z-50 flex flex-col bg-[#0A0A0A] border-r border-[#262626] transition-all duration-300 ease-in-out select-none overflow-hidden ${
-          sidebarCollapsed
-            ? 'w-0 md:w-0 opacity-0 -translate-x-full md:translate-x-0 border-r-0 pointer-events-none'
-            : 'w-[280px] md:w-[270px] opacity-100 translate-x-0'
-        } ${
           mobileSidebarOpen
-            ? '!translate-x-0 !w-[280px] !opacity-100 !pointer-events-auto'
-            : ''
+            ? 'translate-x-0 opacity-100 pointer-events-auto w-[280px] shadow-2xl'
+            : '-translate-x-full opacity-0 pointer-events-none w-[280px]'
+        } ${
+          sidebarCollapsed
+            ? 'md:w-0 md:opacity-0 md:translate-x-0 md:border-r-0 md:pointer-events-none'
+            : 'md:w-[270px] md:opacity-100 md:translate-x-0 md:pointer-events-auto md:border-r'
         }`}
       >
         {/* Inner static-width wrapper keeps content stable during width transitions */}

@@ -133,21 +133,21 @@ export const DocumentsModal: React.FC = () => {
     <div className="fixed inset-0 z-[60] w-screen h-screen bg-[#0A0A0A] flex flex-col overflow-hidden select-none">
       <div className="w-full h-full bg-[#0A0A0A] flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#262626] bg-[#0D0D0D]">
-          <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-[#141414] text-white border border-[#262626]">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-[#262626] bg-[#0D0D0D]">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="p-2 rounded-xl bg-[#141414] text-white border border-[#262626] flex-shrink-0">
               <FileText size={18} />
             </div>
-            <div>
-              <h2 className="text-base font-semibold text-white">Study Documents & PDFs</h2>
-              <p className="text-xs text-[#A1A1AA]">
+            <div className="min-w-0">
+              <h2 className="text-sm sm:text-base font-semibold text-white truncate">Study Documents & PDFs</h2>
+              <p className="text-xs text-[#A1A1AA] hidden sm:block">
                 Upload PDFs for verified page-referenced learning, summaries, and MCQs
               </p>
             </div>
           </div>
           <button
             onClick={() => setActiveModal(null)}
-            className="p-1.5 text-[#A1A1AA] hover:text-white rounded-lg hover:bg-[#1C1C1C] transition-colors"
+            className="p-1.5 text-[#A1A1AA] hover:text-white rounded-lg hover:bg-[#1C1C1C] transition-colors flex-shrink-0 ml-1"
           >
             <X size={18} />
           </button>

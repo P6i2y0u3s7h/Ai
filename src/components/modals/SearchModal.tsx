@@ -166,7 +166,7 @@ export const SearchModal: React.FC = () => {
               }
             }}
             placeholder="Search conversations, topics, lecture notes, or documents..."
-            className="flex-1 bg-transparent text-white placeholder:text-[#71717A] text-sm focus:outline-none"
+            className="flex-1 bg-transparent text-white placeholder:text-[#71717A] text-[16px] sm:text-sm focus:outline-none"
           />
           {query && (
             <button

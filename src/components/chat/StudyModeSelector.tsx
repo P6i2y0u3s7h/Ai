@@ -103,12 +103,12 @@ export const StudyModeSelector: React.FC<StudyModeSelectorProps> = ({ compact = 
         onClick={() => setIsOpen(prev => !prev)}
         className={`flex items-center gap-1.5 rounded-full transition-all text-xs font-medium border select-none ${
           compact
-            ? 'px-2.5 py-1 bg-[#141414] hover:bg-[#1C1C1C] border-[#262626] text-zinc-300'
-            : 'px-3 py-1.5 bg-[#141414] hover:bg-[#1C1C1C] border-[#262626] text-white shadow-sm'
+            ? 'px-2 py-1 bg-[#141414] hover:bg-[#1C1C1C] border-[#262626] text-zinc-300'
+            : 'px-2.5 sm:px-3 py-1.5 bg-[#141414] hover:bg-[#1C1C1C] border-[#262626] text-white shadow-sm'
         }`}
       >
         {getIcon(activeModeObj.id)}
-        <span className="truncate max-w-[120px] sm:max-w-none">{activeModeObj.label}</span>
+        <span className="truncate max-w-[100px] sm:max-w-none">{activeModeObj.label}</span>
         <ChevronDown
           size={13}
           className={`text-zinc-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}

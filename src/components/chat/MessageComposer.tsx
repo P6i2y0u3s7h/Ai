@@ -171,7 +171,7 @@ export const MessageComposer: React.FC = () => {
   const canSend = input.trim().length > 0 || attachments.length > 0;
 
   return (
-    <div className="w-full max-w-[800px] mx-auto px-3 sm:px-4 pb-3 sm:pb-5 pt-1">
+    <div className="w-full max-w-[800px] mx-auto px-3 sm:px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:pb-5 pt-1">
       {/* Hidden file input */}
       <input
         type="file"
@@ -299,7 +299,7 @@ export const MessageComposer: React.FC = () => {
             onChange={e => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={currentModeInfo.promptPlaceholder || 'Ask Ai anything...'}
-            className="flex-1 bg-transparent text-[#FFFFFF] placeholder:text-[#71717A] text-[14.5px] leading-relaxed resize-none focus:outline-none py-2 px-1 max-h-[180px] overflow-y-auto"
+            className="flex-1 bg-transparent text-[#FFFFFF] placeholder:text-[#71717A] text-[16px] sm:text-[14.5px] leading-relaxed resize-none focus:outline-none py-2 px-1 max-h-[180px] overflow-y-auto"
           />
 
           {/* Voice Input Button */}

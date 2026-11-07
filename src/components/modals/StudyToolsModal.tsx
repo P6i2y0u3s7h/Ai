@@ -814,7 +814,7 @@ Provide daily morning, afternoon, and evening blocks with review sessions.`;
                         value={quizTopic}
                         onChange={e => setQuizTopic(e.target.value)}
                         placeholder="e.g. Operating Systems Process Scheduling, Organic Chemistry..."
-                        className="w-full bg-[#141414] text-xs sm:text-sm text-white p-2.5 rounded-xl border border-[#262626] focus:outline-none"
+                        className="w-full bg-[#141414] text-[16px] sm:text-sm text-white p-2.5 rounded-xl border border-[#262626] focus:outline-none"
                       />
                     </div>
                     <div>
@@ -822,7 +822,7 @@ Provide daily morning, afternoon, and evening blocks with review sessions.`;
                       <select
                         value={quizSubject}
                         onChange={e => setQuizSubject(e.target.value)}
-                        className="w-full bg-[#141414] text-xs text-white p-2.5 rounded-xl border border-[#262626] focus:outline-none"
+                        className="w-full bg-[#141414] text-[16px] sm:text-xs text-white p-2.5 rounded-xl border border-[#262626] focus:outline-none"
                       >
                         {SUBJECTS.map(s => <option key={s} value={s}>{s}</option>)}
                       </select>
@@ -832,7 +832,7 @@ Provide daily morning, afternoon, and evening blocks with review sessions.`;
                       <select
                         value={quizDiff}
                         onChange={e => setQuizDiff(e.target.value as any)}
-                        className="w-full bg-[#141414] text-xs text-white p-2.5 rounded-xl border border-[#262626] focus:outline-none"
+                        className="w-full bg-[#141414] text-[16px] sm:text-xs text-white p-2.5 rounded-xl border border-[#262626] focus:outline-none"
                       >
                         <option value="easy">Easy (Foundational)</option>
                         <option value="medium">Medium (Standard Exam)</option>
@@ -958,7 +958,7 @@ Provide daily morning, afternoon, and evening blocks with review sessions.`;
                       value={deckTopic}
                       onChange={e => setDeckTopic(e.target.value)}
                       placeholder="e.g. Graph Theory, Photosynthesis..."
-                      className="w-full bg-[#141414] text-xs text-white p-2.5 rounded-xl border border-[#262626] focus:outline-none"
+                      className="w-full bg-[#141414] text-[16px] sm:text-xs text-white p-2.5 rounded-xl border border-[#262626] focus:outline-none"
                     />
                   </div>
                   <div>
@@ -966,7 +966,7 @@ Provide daily morning, afternoon, and evening blocks with review sessions.`;
                     <select
                       value={deckFromNoteId}
                       onChange={e => setDeckFromNoteId(e.target.value)}
-                      className="w-full bg-[#141414] text-xs text-white p-2.5 rounded-xl border border-[#262626] focus:outline-none"
+                      className="w-full bg-[#141414] text-[16px] sm:text-xs text-white p-2.5 rounded-xl border border-[#262626] focus:outline-none"
                     >
                       <option value="">-- Choose a note (optional) --</option>
                       {notes.map(n => <option key={n.id} value={n.id}>{n.title}</option>)}
@@ -1081,7 +1081,7 @@ Provide daily morning, afternoon, and evening blocks with review sessions.`;
                 value={summarizerText}
                 onChange={e => setSummarizerText(e.target.value)}
                 placeholder="Paste study text, lecture transcript, or chapter excerpt here..."
-                className="w-full h-40 bg-[#0D0D0D] text-xs sm:text-sm text-white p-3.5 rounded-xl border border-[#262626] focus:outline-none"
+                className="w-full h-40 bg-[#0D0D0D] text-[16px] sm:text-sm text-white p-3.5 rounded-xl border border-[#262626] focus:outline-none"
               />
 
               <button
@@ -1137,7 +1137,7 @@ Provide daily morning, afternoon, and evening blocks with review sessions.`;
                       value={explainTopicInput}
                       onChange={e => setExplainTopicInput(e.target.value)}
                       placeholder="e.g. Backpropagation, Quantum Tunneling, Master Theorem..."
-                      className="w-full bg-[#141414] text-xs text-white p-2.5 rounded-xl border border-[#262626] focus:outline-none"
+                      className="w-full bg-[#141414] text-[16px] sm:text-xs text-white p-2.5 rounded-xl border border-[#262626] focus:outline-none"
                     />
                   </div>
                   <div>
@@ -1145,7 +1145,7 @@ Provide daily morning, afternoon, and evening blocks with review sessions.`;
                     <select
                       value={explainLang}
                       onChange={e => setExplainLang(e.target.value as any)}
-                      className="w-full bg-[#141414] text-xs text-white p-2.5 rounded-xl border border-[#262626] focus:outline-none"
+                      className="w-full bg-[#141414] text-[16px] sm:text-xs text-white p-2.5 rounded-xl border border-[#262626] focus:outline-none"
                     >
                       <option value="english">Simple English (ELI5)</option>
                       <option value="hinglish">Conversational Hinglish</option>
@@ -1198,19 +1198,19 @@ Provide daily morning, afternoon, and evening blocks with review sessions.`;
                 </div>
               </div>
 
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <input
                   type="text"
                   value={mcqTopic}
                   onChange={e => setMcqTopic(e.target.value)}
                   placeholder="Enter subject or topic (e.g. Data Structures, Cell Division)..."
-                  className="flex-1 bg-[#0D0D0D] text-xs text-white p-2.5 rounded-xl border border-[#262626] focus:outline-none"
+                  className="flex-1 bg-[#0D0D0D] text-[16px] sm:text-xs text-white p-2.5 rounded-xl border border-[#262626] focus:outline-none"
                 />
                 <button
                   type="button"
                   onClick={handleGenerateMcqs}
                   disabled={mcqLoading || !mcqTopic.trim()}
-                  className="px-5 py-2.5 rounded-xl bg-white text-black font-semibold text-xs hover:bg-zinc-200 disabled:opacity-50 flex items-center gap-1.5"
+                  className="px-5 py-2.5 rounded-xl bg-white text-black font-semibold text-xs hover:bg-zinc-200 disabled:opacity-50 flex items-center justify-center gap-1.5"
                 >
                   {mcqLoading ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
                   <span>Generate</span>
@@ -1279,7 +1279,7 @@ Provide daily morning, afternoon, and evening blocks with review sessions.`;
                 <select
                   value={pdfSelectedDocId}
                   onChange={e => setPdfSelectedDocId(e.target.value)}
-                  className="w-full bg-[#141414] text-xs text-white p-2.5 rounded-xl border border-[#262626] focus:outline-none"
+                  className="w-full bg-[#141414] text-[16px] sm:text-xs text-white p-2.5 rounded-xl border border-[#262626] focus:outline-none"
                 >
                   <option value="">-- Choose a document from My Documents --</option>
                   {documents.map(d => (
@@ -1350,14 +1350,14 @@ Provide daily morning, afternoon, and evening blocks with review sessions.`;
                       value={planTopic}
                       onChange={e => setPlanTopic(e.target.value)}
                       placeholder="Task or topic to study..."
-                      className="w-full bg-[#141414] text-xs text-white p-2 rounded-xl border border-[#262626] focus:outline-none"
+                      className="w-full bg-[#141414] text-[16px] sm:text-xs text-white p-2 rounded-xl border border-[#262626] focus:outline-none"
                     />
                   </div>
                   <div>
                     <select
                       value={planSubject}
                       onChange={e => setPlanSubject(e.target.value)}
-                      className="w-full bg-[#141414] text-xs text-white p-2 rounded-xl border border-[#262626] focus:outline-none"
+                      className="w-full bg-[#141414] text-[16px] sm:text-xs text-white p-2 rounded-xl border border-[#262626] focus:outline-none"
                     >
                       {SUBJECTS.map(s => <option key={s} value={s}>{s}</option>)}
                     </select>
@@ -1464,7 +1464,7 @@ Provide daily morning, afternoon, and evening blocks with review sessions.`;
                         value={mockTopic}
                         onChange={e => setMockTopic(e.target.value)}
                         placeholder="e.g. Full Semester Computer Networks, Organic Reactions..."
-                        className="w-full bg-[#141414] text-xs text-white p-2.5 rounded-xl border border-[#262626] focus:outline-none"
+                        className="w-full bg-[#141414] text-[16px] sm:text-xs text-white p-2.5 rounded-xl border border-[#262626] focus:outline-none"
                       />
                     </div>
                     <div>
@@ -1472,7 +1472,7 @@ Provide daily morning, afternoon, and evening blocks with review sessions.`;
                       <select
                         value={mockDuration}
                         onChange={e => setMockDuration(Number(e.target.value))}
-                        className="w-full bg-[#141414] text-xs text-white p-2.5 rounded-xl border border-[#262626] focus:outline-none"
+                        className="w-full bg-[#141414] text-[16px] sm:text-xs text-white p-2.5 rounded-xl border border-[#262626] focus:outline-none"
                       >
                         <option value={15}>15 Minutes</option>
                         <option value={30}>30 Minutes</option>
@@ -1582,7 +1582,7 @@ Provide daily morning, afternoon, and evening blocks with review sessions.`;
                   <select
                     value={codeLang}
                     onChange={e => setCodeLang(e.target.value)}
-                    className="bg-[#141414] text-xs text-white px-2 py-1 rounded-lg border border-[#262626] focus:outline-none"
+                    className="bg-[#141414] text-[16px] sm:text-xs text-white px-2 py-1 rounded-lg border border-[#262626] focus:outline-none"
                   >
                     <option value="Python">Python</option>
                     <option value="JavaScript / TypeScript">JavaScript / TypeScript</option>
@@ -1597,7 +1597,7 @@ Provide daily morning, afternoon, and evening blocks with review sessions.`;
                   value={codeSnippet}
                   onChange={e => setCodeSnippet(e.target.value)}
                   placeholder="Paste programming code snippet here..."
-                  className="w-full h-44 bg-[#0A0A0A] text-xs text-white p-3.5 rounded-xl border border-[#262626] focus:outline-none font-mono"
+                  className="w-full h-44 bg-[#0A0A0A] text-[16px] sm:text-xs text-white p-3.5 rounded-xl border border-[#262626] focus:outline-none font-mono"
                 />
 
                 <button

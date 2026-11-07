@@ -81,7 +81,7 @@ export const ExamPreparationPanel: React.FC = () => {
                   placeholder="e.g. Operating Systems, DBMS, Physics"
                   value={examConfig.subject}
                   onChange={e => setExamConfig(prev => ({ ...prev, subject: e.target.value }))}
-                  className="w-full px-2.5 py-1.5 rounded-xl bg-[#0A0A0A] border border-[#262626] text-xs text-white placeholder:text-zinc-600 focus:outline-none focus:border-zinc-500"
+                  className="w-full px-2.5 py-1.5 rounded-xl bg-[#0A0A0A] border border-[#262626] text-[16px] sm:text-xs text-white placeholder:text-zinc-600 focus:outline-none focus:border-zinc-500"
                 />
               </div>
 
@@ -95,7 +95,7 @@ export const ExamPreparationPanel: React.FC = () => {
                   placeholder="e.g. Banker's Algorithm, Normalization"
                   value={examConfig.topic}
                   onChange={e => setExamConfig(prev => ({ ...prev, topic: e.target.value }))}
-                  className="w-full px-2.5 py-1.5 rounded-xl bg-[#0A0A0A] border border-[#262626] text-xs text-white placeholder:text-zinc-600 focus:outline-none focus:border-zinc-500"
+                  className="w-full px-2.5 py-1.5 rounded-xl bg-[#0A0A0A] border border-[#262626] text-[16px] sm:text-xs text-white placeholder:text-zinc-600 focus:outline-none focus:border-zinc-500"
                 />
               </div>
             </div>

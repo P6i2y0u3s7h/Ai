@@ -115,6 +115,8 @@ body {
 
 .markdown-content table {
   width: 100%;
+  display: block;
+  overflow-x: auto;
   border-collapse: collapse;
   margin: 1.2rem 0;
   font-size: 0.88rem;
