@@ -103,15 +103,22 @@ export const NotesModal: React.FC = () => {
 
   // Filtered notes based on Search, Subject, and Semester
   const filteredNotes = useMemo(() => {
-    return notes.filter(n => {
-      const q = filter.toLowerCase().trim();
+    return (notes || []).filter(n => {
+      if (!n) return false;
+      const q = (filter || '').toLowerCase().trim();
+      const nTitle = (n.title || '').toLowerCase();
+      const nTopic = (n.topic || '').toLowerCase();
+      const nContent = (n.content || '').toLowerCase();
+      const nSemester = (n.semester || '').toLowerCase();
+      const nTags = Array.isArray(n.tags) ? n.tags : [];
+
       const matchesText =
         !q ||
-        n.title.toLowerCase().includes(q) ||
-        (n.topic && n.topic.toLowerCase().includes(q)) ||
-        n.content.toLowerCase().includes(q) ||
-        (n.semester && n.semester.toLowerCase().includes(q)) ||
-        n.tags.some(t => t.toLowerCase().includes(q));
+        nTitle.includes(q) ||
+        nTopic.includes(q) ||
+        nContent.includes(q) ||
+        nSemester.includes(q) ||
+        nTags.some(t => typeof t === 'string' && t.toLowerCase().includes(q));
 
       const matchesSubject = subjectFilter === 'All' || (n.subject || 'General') === subjectFilter;
       const matchesSemester =
@@ -134,12 +141,12 @@ export const NotesModal: React.FC = () => {
     setEditingId(note.id);
     setCreating(false);
     setForm({
-      title: note.title,
+      title: note.title || '',
       topic: note.topic || '',
       subject: note.subject || 'General',
       semester: note.semester || 'All Semesters',
-      content: note.content,
-      tags: note.tags.join(', ')
+      content: note.content || '',
+      tags: Array.isArray(note.tags) ? note.tags.join(', ') : ''
     });
   };
 
@@ -321,7 +328,7 @@ export const NotesModal: React.FC = () => {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/85 backdrop-blur-md"
+      className="fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-5 bg-black/85 backdrop-blur-md"
       onKeyDown={e => {
         if (e.key === 'Escape') {
           e.stopPropagation();

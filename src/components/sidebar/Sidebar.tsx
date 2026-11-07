@@ -33,6 +33,11 @@ export const Sidebar: React.FC = () => {
     setSidebarCollapsed(prev => !prev);
   };
 
+  const handleOpenModal = (modal: typeof activeModal) => {
+    setActiveModal(modal);
+    setMobileSidebarOpen(false);
+  };
+
   return (
     <>
       {/* Mobile Drawer Overlay */}
@@ -89,14 +94,14 @@ export const Sidebar: React.FC = () => {
             icon={Search}
             label="Search Chats"
             isCollapsed={sidebarCollapsed}
-            onClick={() => setActiveModal('search')}
+            onClick={() => handleOpenModal('search')}
           />
           <NavigationItem
             icon={Wrench}
             label="Study Tools"
             isCollapsed={sidebarCollapsed}
             isActive={activeModal === 'tools'}
-            onClick={() => setActiveModal('tools')}
+            onClick={() => handleOpenModal('tools')}
           />
           <NavigationItem
             icon={BookOpen}
@@ -104,7 +109,7 @@ export const Sidebar: React.FC = () => {
             badge={notes.length > 0 ? notes.length : undefined}
             isCollapsed={sidebarCollapsed}
             isActive={activeModal === 'notes'}
-            onClick={() => setActiveModal('notes')}
+            onClick={() => handleOpenModal('notes')}
           />
           <NavigationItem
             icon={FileText}
@@ -112,14 +117,14 @@ export const Sidebar: React.FC = () => {
             badge={documents.length > 0 ? documents.length : undefined}
             isCollapsed={sidebarCollapsed}
             isActive={activeModal === 'documents'}
-            onClick={() => setActiveModal('documents')}
+            onClick={() => handleOpenModal('documents')}
           />
           <NavigationItem
             icon={Award}
             label="Quiz History"
             isCollapsed={sidebarCollapsed}
             isActive={activeModal === 'quiz'}
-            onClick={() => setActiveModal('quiz')}
+            onClick={() => handleOpenModal('quiz')}
           />
           <NavigationItem
             icon={CalendarDays}
@@ -127,7 +132,7 @@ export const Sidebar: React.FC = () => {
             badge={tasks.filter(t => !t.completed).length || undefined}
             isCollapsed={sidebarCollapsed}
             isActive={activeModal === 'planner'}
-            onClick={() => setActiveModal('planner')}
+            onClick={() => handleOpenModal('planner')}
           />
         </div>
 
