@@ -6,7 +6,8 @@ import {
   BookOpen,
   FileText,
   Award,
-  CalendarDays
+  CalendarDays,
+  X
 } from 'lucide-react';
 import { SidebarHeader } from './SidebarHeader';
 import { NavigationItem } from './NavigationItem';
