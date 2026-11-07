@@ -6,8 +6,7 @@ import {
   BookOpen,
   FileText,
   Award,
-  CalendarDays,
-  X
+  CalendarDays
 } from 'lucide-react';
 import { SidebarHeader } from './SidebarHeader';
 import { NavigationItem } from './NavigationItem';
@@ -31,6 +30,7 @@ export const Sidebar: React.FC = () => {
 
   const handleToggleCollapse = () => {
     setSidebarCollapsed(prev => !prev);
+    setMobileSidebarOpen(false);
   };
 
   const handleOpenModal = (modal: typeof activeModal) => {
@@ -62,17 +62,6 @@ export const Sidebar: React.FC = () => {
       >
         {/* Inner static-width wrapper keeps content stable during width transitions */}
         <div className="w-[270px] h-full flex flex-col flex-shrink-0">
-          {/* Mobile close button header on small screens */}
-          <div className="flex md:hidden items-center justify-between px-3 h-12 border-b border-[#262626] bg-[#0A0A0A]">
-            <span className="text-sm font-semibold text-white tracking-tight">Ai</span>
-            <button
-              onClick={() => setMobileSidebarOpen(false)}
-              className="p-1.5 text-[#A1A1AA] hover:text-white rounded-lg hover:bg-[#1C1C1C]"
-            >
-              <X size={18} />
-            </button>
-          </div>
-
           {/* Sidebar Header */}
           <SidebarHeader
             onToggleCollapse={handleToggleCollapse}
