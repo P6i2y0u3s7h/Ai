@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Sidebar } from '../sidebar/Sidebar';
 import { ChatHeader } from '../chat/ChatHeader';
 import { MessageList } from '../chat/MessageList';
@@ -15,7 +15,25 @@ import { ErrorBoundary } from '../common/ErrorBoundary';
 import { useChat } from '../../context/ChatContext';
 
 export const AppLayout: React.FC = () => {
-  const { toastMessage, setActiveModal } = useChat();
+  const { toastMessage, setActiveModal, setSidebarCollapsed } = useChat();
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Toggle sidebar: Ctrl+B or Ctrl+\ or Cmd+B
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'b' || e.key === 'B' || e.key === '\\')) {
+        e.preventDefault();
+        setSidebarCollapsed(prev => !prev);
+      }
+      // Open Search: Ctrl+K or Cmd+K
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) {
+        e.preventDefault();
+        setActiveModal('search');
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [setSidebarCollapsed, setActiveModal]);
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-black text-[#FFFFFF] font-sans antialiased">

@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
   Menu,
-  PanelLeftOpen,
+  PanelLeft,
+  SquarePen,
   Share2,
   MoreVertical,
   Trash2,
@@ -19,6 +20,7 @@ export const ChatHeader: React.FC = () => {
     sidebarCollapsed,
     setSidebarCollapsed,
     setMobileSidebarOpen,
+    createNewChat,
     setActiveModal,
     clearCurrentChat,
     showToast
@@ -62,17 +64,28 @@ export const ChatHeader: React.FC = () => {
           <Menu size={19} />
         </button>
 
-        {/* Desktop expand sidebar button when collapsed */}
+        {/* Desktop ChatGPT-style Open Sidebar button & New Chat when collapsed */}
         {sidebarCollapsed && (
-          <button
-            type="button"
-            onClick={() => setSidebarCollapsed(false)}
-            className="hidden md:flex p-2 text-[#A1A1AA] hover:text-white rounded-lg hover:bg-[#1C1C1C] transition-colors"
-            title="Expand sidebar"
-            aria-label="Expand sidebar"
-          >
-            <PanelLeftOpen size={19} />
-          </button>
+          <div className="hidden md:flex items-center gap-1 mr-1">
+            <button
+              type="button"
+              onClick={() => setSidebarCollapsed(false)}
+              className="p-2 text-[#A1A1AA] hover:text-white rounded-lg hover:bg-[#1C1C1C] transition-colors"
+              title="Open sidebar (Ctrl+B)"
+              aria-label="Open sidebar"
+            >
+              <PanelLeft size={19} />
+            </button>
+            <button
+              type="button"
+              onClick={() => createNewChat()}
+              className="p-2 text-[#A1A1AA] hover:text-white rounded-lg hover:bg-[#1C1C1C] transition-colors"
+              title="New chat"
+              aria-label="New chat"
+            >
+              <SquarePen size={18} />
+            </button>
+          </div>
         )}
 
         {/* Study Mode Selector Pill in header */}
