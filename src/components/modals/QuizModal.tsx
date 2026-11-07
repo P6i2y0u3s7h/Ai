@@ -55,6 +55,7 @@ export const QuizModal: React.FC = () => {
   const [genError, setGenError] = useState('');
   const [selectedSession, setSelectedSession] = useState<QuizSession | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [chartMode, setChartMode] = useState<'bars' | 'trend'>('bars');
 
   // Filter & Search in History
   const [historySearch, setHistorySearch] = useState('');
@@ -399,42 +400,224 @@ Output in validated JSON block using tag 'json:studyai-mcq':
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 
                 {/* Weekly / Monthly Timeline Chart (Pure SVG / CSS Responsive) */}
-                <div className="lg:col-span-2 p-5 rounded-2xl bg-[#0D0D0D] border border-[#202020] space-y-3">
-                  <div className="flex items-center justify-between border-b border-[#202020] pb-2.5">
+                <div className="lg:col-span-2 p-5 rounded-2xl bg-[#0D0D0D] border border-[#202020] space-y-4">
+                  <div className="flex items-center justify-between border-b border-[#202020] pb-3">
                     <div className="flex items-center gap-2">
                       <BarChart3 size={16} className="text-white" />
                       <h4 className="text-xs font-bold text-white uppercase tracking-wider">Score Progression Over Time</h4>
                     </div>
-                    <span className="text-[11px] text-[#71717A] font-mono">Last {Math.min(quizSessions.length, 10)} Attempts</span>
+
+                    <div className="flex items-center gap-2">
+                      {quizSessions.length > 1 && (
+                        <div className="flex items-center bg-[#141414] border border-[#262626] rounded-lg p-0.5 text-[11px]">
+                          <button
+                            type="button"
+                            onClick={() => setChartMode('bars')}
+                            className={`px-2 py-0.5 rounded flex items-center gap-1 transition-all ${
+                              chartMode === 'bars' ? 'bg-white text-black font-semibold shadow' : 'text-zinc-400 hover:text-white'
+                            }`}
+                            title="Bar Chart View"
+                          >
+                            <BarChart3 size={12} />
+                            <span>Bars</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setChartMode('trend')}
+                            className={`px-2 py-0.5 rounded flex items-center gap-1 transition-all ${
+                              chartMode === 'trend' ? 'bg-white text-black font-semibold shadow' : 'text-zinc-400 hover:text-white'
+                            }`}
+                            title="Trend Curve View"
+                          >
+                            <TrendingUp size={12} />
+                            <span>Trend</span>
+                          </button>
+                        </div>
+                      )}
+                      <span className="text-[11px] text-[#71717A] font-mono">
+                        {quizSessions.length === 1 ? '1 Attempt Logged' : `Last ${Math.min(quizSessions.length, 10)} Attempts`}
+                      </span>
+                    </div>
                   </div>
 
                   {quizSessions.length === 0 ? (
-                    <div className="h-44 flex items-center justify-center text-xs text-[#71717A]">
-                      Complete quizzes to render score progression graphs.
+                    <div className="h-56 flex flex-col items-center justify-center text-xs text-[#71717A] gap-2 border border-dashed border-[#222] rounded-xl bg-[#0A0A0A]">
+                      <BarChart3 size={24} className="text-zinc-600" />
+                      <p>Complete quizzes to render score progression graphs.</p>
                     </div>
-                  ) : (
-                    <div className="h-44 flex items-end gap-3 pt-4 px-2">
-                      {quizSessions.slice(-10).map((s, idx) => {
+                  ) : chartMode === 'trend' && quizSessions.length > 1 ? (
+                    // SVG Trend Curve Area Graph
+                    (() => {
+                      const sessions = quizSessions.slice(-10);
+                      const n = sessions.length;
+                      const width = 560;
+                      const height = 180;
+                      const padX = 40;
+                      const padY = 24;
+                      const chartW = width - padX * 2;
+                      const chartH = height - padY * 2;
+
+                      const points = sessions.map((s, i) => {
                         const pct = Math.round((s.score / (s.total || 1)) * 100);
-                        return (
-                          <div key={s.id || idx} className="flex-1 flex flex-col items-center gap-1.5 group">
-                            <span className="text-[10px] font-mono text-zinc-400 group-hover:text-white transition-colors">
-                              {pct}%
-                            </span>
-                            <div className="w-full bg-[#181818] rounded-t-lg h-32 flex items-end overflow-hidden">
-                              <div
-                                style={{ height: `${pct}%` }}
-                                className={`w-full rounded-t-md transition-all duration-300 ${
-                                  pct >= 80 ? 'bg-white' : pct >= 50 ? 'bg-zinc-400' : 'bg-zinc-600'
-                                }`}
-                              />
+                        const x = padX + (i / (n - 1)) * chartW;
+                        const y = padY + (1 - pct / 100) * chartH;
+                        return { x, y, pct, session: s, index: i };
+                      });
+
+                      const pathD = points.reduce((acc, pt, i) => {
+                        return i === 0 ? `M ${pt.x} ${pt.y}` : `${acc} L ${pt.x} ${pt.y}`;
+                      }, '');
+
+                      const areaD = `${pathD} L ${points[points.length - 1].x} ${height - padY} L ${points[0].x} ${height - padY} Z`;
+
+                      return (
+                        <div className="relative h-56 pt-2 pb-1 flex flex-col justify-between select-none">
+                          <div className="absolute inset-x-0 inset-y-0 flex flex-col justify-between pointer-events-none pr-2 pl-9 text-[10px] font-mono text-zinc-600">
+                            <div className="w-full flex items-center gap-2 border-b border-zinc-800/60 pb-0.5">
+                              <span className="w-6 text-right">100%</span>
+                              <div className="flex-1 h-px bg-zinc-800/40" />
                             </div>
-                            <span className="text-[9px] text-[#71717A] truncate w-full text-center">
-                              {new Date(s.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
-                            </span>
+                            <div className="w-full flex items-center gap-2 border-b border-emerald-500/20 pb-0.5 text-emerald-500/60">
+                              <span className="w-6 text-right">80%</span>
+                              <div className="flex-1 h-px border-b border-dashed border-emerald-500/30" />
+                              <span className="text-[9px] font-sans font-medium uppercase tracking-wider text-emerald-400/80 bg-emerald-950/40 px-1.5 py-0.5 rounded border border-emerald-500/20">Mastery</span>
+                            </div>
+                            <div className="w-full flex items-center gap-2 border-b border-zinc-800/50 pb-0.5">
+                              <span className="w-6 text-right">50%</span>
+                              <div className="flex-1 h-px border-b border-dashed border-zinc-800" />
+                            </div>
+                            <div className="w-full flex items-center gap-2 border-b border-zinc-700/60 pb-0.5">
+                              <span className="w-6 text-right">0%</span>
+                              <div className="flex-1 h-px bg-zinc-700/60" />
+                            </div>
                           </div>
-                        );
-                      })}
+
+                          <div className="relative z-10 w-full h-full pl-8 pr-2">
+                            <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-full overflow-visible">
+                              <defs>
+                                <linearGradient id="scoreAreaGrad" x1="0" y1="0" x2="0" y2="1">
+                                  <stop offset="0%" stopColor="#ffffff" stopOpacity="0.25" />
+                                  <stop offset="85%" stopColor="#ffffff" stopOpacity="0.03" />
+                                  <stop offset="100%" stopColor="#ffffff" stopOpacity="0.0" />
+                                </linearGradient>
+                              </defs>
+                              <path d={areaD} fill="url(#scoreAreaGrad)" />
+                              <path d={pathD} fill="none" stroke="#ffffff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                              {points.map((pt, i) => (
+                                <g key={i} className="group cursor-pointer">
+                                  <circle
+                                    cx={pt.x}
+                                    cy={pt.y}
+                                    r="5"
+                                    className="fill-white stroke-[#0D0D0D] stroke-[3px] transition-transform duration-200 group-hover:scale-150"
+                                  />
+                                  <text
+                                    x={pt.x}
+                                    y={pt.y - 10}
+                                    textAnchor="middle"
+                                    className="fill-zinc-300 font-mono text-[10px] font-bold group-hover:fill-white"
+                                  >
+                                    {pt.pct}%
+                                  </text>
+                                  <text
+                                    x={pt.x}
+                                    y={height - 6}
+                                    textAnchor="middle"
+                                    className="fill-zinc-500 font-sans text-[9px] group-hover:fill-zinc-300"
+                                  >
+                                    {new Date(pt.session.date).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}
+                                  </text>
+                                </g>
+                              ))}
+                            </svg>
+                          </div>
+                        </div>
+                      );
+                    })()
+                  ) : (
+                    // Clean Proportional Bar Chart with Y-Axis Benchmarks (No stretching on 1 attempt)
+                    <div className="relative h-56 pt-2 pb-1 flex flex-col justify-between select-none">
+                      {/* Background Y-Axis Reference Gridlines */}
+                      <div className="absolute inset-x-0 inset-y-0 flex flex-col justify-between pointer-events-none pr-2 pl-9 text-[10px] font-mono text-zinc-600">
+                        <div className="w-full flex items-center gap-2 border-b border-zinc-800/60 pb-0.5">
+                          <span className="w-6 text-right">100%</span>
+                          <div className="flex-1 h-px bg-zinc-800/40" />
+                        </div>
+                        <div className="w-full flex items-center gap-2 border-b border-emerald-500/20 pb-0.5 text-emerald-500/60">
+                          <span className="w-6 text-right">80%</span>
+                          <div className="flex-1 h-px border-b border-dashed border-emerald-500/30" />
+                          <span className="text-[9px] font-sans font-medium uppercase tracking-wider text-emerald-400/80 bg-emerald-950/40 px-1.5 py-0.5 rounded border border-emerald-500/20">Mastery</span>
+                        </div>
+                        <div className="w-full flex items-center gap-2 border-b border-zinc-800/50 pb-0.5">
+                          <span className="w-6 text-right">50%</span>
+                          <div className="flex-1 h-px border-b border-dashed border-zinc-800" />
+                        </div>
+                        <div className="w-full flex items-center gap-2 border-b border-zinc-700/60 pb-0.5">
+                          <span className="w-6 text-right">0%</span>
+                          <div className="flex-1 h-px bg-zinc-700/60" />
+                        </div>
+                      </div>
+
+                      {/* Foreground Bars: Proportional, Never stretched into full-width rectangles */}
+                      <div className="relative z-10 flex-1 pl-12 pr-4 flex items-end justify-center sm:justify-around gap-4 sm:gap-6 overflow-x-auto pb-1">
+                        {quizSessions.slice(-10).map((s, idx) => {
+                          const pct = Math.round((s.score / (s.total || 1)) * 100);
+                          const isHigh = pct >= 80;
+                          const isMid = pct >= 50;
+
+                          return (
+                            <div
+                              key={s.id || idx}
+                              className="flex flex-col items-center gap-1.5 group relative w-12 sm:w-14 max-w-[56px] min-w-[36px]"
+                            >
+                              {/* Interactive Tooltip Card on Hover */}
+                              <div className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 z-40 pointer-events-none opacity-0 group-hover:opacity-100 transition-all duration-200 transform group-hover:-translate-y-1 w-48 p-2.5 rounded-xl bg-[#141414] border border-[#2E2E2E] shadow-2xl text-left select-none">
+                                <p className="font-semibold text-xs text-white truncate">{s.topic || s.title || 'Quiz'}</p>
+                                <div className="flex items-center justify-between mt-1 text-[11px] font-mono">
+                                  <span className="text-zinc-400">Score:</span>
+                                  <span className="font-bold text-white">{s.score} / {s.total} ({pct}%)</span>
+                                </div>
+                                <div className="flex items-center justify-between text-[10px] text-zinc-500 mt-0.5">
+                                  <span>{s.subject || 'General'}</span>
+                                  <span>{s.difficulty || 'Medium'}</span>
+                                </div>
+                                <p className="text-[9px] text-zinc-600 mt-1 border-t border-[#222] pt-1">
+                                  {new Date(s.date).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}
+                                </p>
+                              </div>
+
+                              {/* Score percentage label */}
+                              <span className={`text-[11px] font-mono font-bold transition-colors ${
+                                isHigh ? 'text-emerald-400 group-hover:text-emerald-300' : isMid ? 'text-zinc-300 group-hover:text-white' : 'text-amber-400 group-hover:text-amber-300'
+                              }`}>
+                                {pct}%
+                              </span>
+
+                              {/* Vertical Bar track & fill with rounded top & gradient */}
+                              <div className="w-full bg-[#161616] border border-white/5 group-hover:border-white/20 rounded-t-xl h-36 flex items-end p-1 transition-all overflow-hidden shadow-inner">
+                                <div
+                                  style={{ height: `${pct}%` }}
+                                  className={`w-full rounded-t-lg transition-all duration-500 ${
+                                    isHigh
+                                      ? 'bg-gradient-to-t from-emerald-600 to-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.35)]'
+                                      : isMid
+                                      ? 'bg-gradient-to-t from-zinc-500 to-zinc-200 shadow-[0_0_10px_rgba(255,255,255,0.15)]'
+                                      : 'bg-gradient-to-t from-amber-600 to-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.25)]'
+                                  }`}
+                                />
+                              </div>
+
+                              {/* Date & Attempt tag below baseline */}
+                              <span className="text-[10px] font-medium text-zinc-400 group-hover:text-white truncate w-full text-center">
+                                {new Date(s.date).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}
+                              </span>
+                              <span className="text-[9px] font-mono text-zinc-600">
+                                #{idx + 1}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
                   )}
                 </div>
